@@ -8,7 +8,6 @@ interface TiltCardProps {
 
 export const TiltCard: React.FC<TiltCardProps> = ({ children, className = "" }) => {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
-  const [sheen, setSheen] = useState({ x: 0, y: 0 });
   const [isTouch, setIsTouch] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
@@ -36,11 +35,6 @@ export const TiltCard: React.FC<TiltCardProps> = ({ children, className = "" }) 
       x: -yPct * 10, 
       y: xPct * 10
     });
-
-    setSheen({
-      x: (mouseX / width) * 100,
-      y: (mouseY / height) * 100
-    });
   }, [isTouch]);
 
   const onMouseLeave = useCallback(() => {
@@ -64,17 +58,6 @@ export const TiltCard: React.FC<TiltCardProps> = ({ children, className = "" }) 
           transformStyle: 'preserve-3d'
         }}
       >
-        {/* Dynamic Glass Sheen */}
-        {!isTouch && (
-          <div 
-            className="absolute inset-0 pointer-events-none z-10 opacity-30"
-            style={{
-              background: `radial-gradient(circle at ${sheen.x}% ${sheen.y}%, rgba(255,255,255,0.8) 0%, transparent 60%)`,
-              mixBlendMode: 'soft-light'
-            }}
-          />
-        )}
-        
         <div className="h-full w-full" style={{ transform: isTouch ? 'none' : 'translateZ(40px)' }}>
           {children}
         </div>
