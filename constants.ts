@@ -2,13 +2,13 @@
 import { Product } from './types';
 
 export const COLORS = {
-  parchment: '#F8F6F3',
-  clay: '#C4B59D',
-  mineral: '#1B3B5A',
-  moss: '#4A5D4B',
-  ochre: '#A65D3C',
-  ink: '#121212',
-  basalt: '#2D2D2D'
+  parchment: '#F2EDE4', /* Tea-stained paper */
+  clay: '#B09E80',     /* Sun-dried river mud */
+  mineral: '#2D3E50',  /* Archival vintage indigo */
+  moss: '#4A5649',     /* Aged safari canvas */
+  ochre: '#8E4E35',    /* Nairobi red soil */
+  ink: '#1A1816',      /* 1920s typewriter ink */
+  sepia: '#5E4B3C'     /* Oxidized photographic silver */
 };
 
 export const INITIAL_PRODUCTS: Product[] = [

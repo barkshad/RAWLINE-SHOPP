@@ -4,19 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAWLINE — Structural Archive</title>
+    <title>RAWLINE — Maison d'Archive Nairobi</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --raw-bg: #F8F6F3;
-            --raw-ink: #121212;
-            --raw-clay: #C4B59D;
-            --raw-mineral: #1B3B5A;
-            --raw-ochre: #A65D3C;
-            --raw-moss: #4A5D4B;
+            /* Vintage Kenyan Luxury Palette */
+            --raw-bg: #F2EDE4; /* Tea-stained parchment */
+            --raw-ink: #1A1816; /* Deep charcoal ink */
+            --raw-clay: #B09E80; /* Sun-dried mud */
+            --raw-mineral: #1B3147; /* Faded archival indigo */
+            --raw-ochre: #8E4E35; /* Oxidized Nairobi soil */
+            --raw-moss: #3D4A3E; /* Dusty savanna green */
+            --raw-gold: #D4AF37; /* Burnished gold */
         }
         
         body {
@@ -28,68 +30,29 @@
             letter-spacing: -0.01em;
         }
 
-        /* Fluid Editorial Typography */
-        .hero-title {
-            font-size: clamp(3.5rem, 16vw, 20rem);
-            line-height: 0.78;
-            letter-spacing: -0.06em;
-            font-weight: 400;
-        }
-
         .serif { font-family: 'Playfair Display', serif; }
         .mono { font-family: 'Space Mono', monospace; }
+        .handwritten { font-family: 'Caveat', cursive; }
 
-        /* Custom Scrollbar - Minimalist */
-        ::-webkit-scrollbar { width: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: var(--raw-ochre); }
-
-        /* Reveal System - Smoother cubic-bezier */
-        .reveal {
-            opacity: 0;
-            transform: translateY(60px);
-            transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
-            will-change: opacity, transform;
-        }
-        .reveal.active {
-            opacity: 1;
-            transform: translateY(0);
+        /* Vintage Overlays */
+        .vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 998;
+            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.15) 100%);
         }
 
-        /* Perspective for Cards */
-        .perspective-lg {
-            perspective: 2000px;
+        .vintage-tint {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 997;
+            background: rgba(142, 78, 53, 0.03); /* Subtle ochre wash */
+            mix-blend-mode: multiply;
         }
 
-        /* Custom Cursor Styling */
-        @media (pointer: fine) {
-            body { cursor: none; }
-            #cursor {
-                position: fixed;
-                width: 6px;
-                height: 6px;
-                background: var(--raw-ochre);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 99999;
-                transition: transform 0.15s ease;
-            }
-            #cursor-follower {
-                position: fixed;
-                width: 36px;
-                height: 36px;
-                border: 0.5px solid rgba(0,0,0,0.1);
-                background: rgba(255,255,255,0.05);
-                backdrop-filter: blur(2px);
-                border-radius: 50%;
-                pointer-events: none;
-                z-index: 99998;
-                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            }
-        }
-
-        /* Animated Grain Layer */
+        /* Enhanced Noise System */
         .noise::after {
             content: "";
             position: fixed;
@@ -98,40 +61,98 @@
             width: 200%;
             height: 200%;
             pointer-events: none;
-            z-index: 999;
-            opacity: 0.05;
+            z-index: 1000;
+            opacity: 0.08;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-            animation: grain 8s steps(10) infinite;
+            animation: grain 4s steps(10) infinite;
         }
 
         @keyframes grain {
             0%, 100% { transform:translate(0, 0) }
-            10% { transform:translate(-5%, -10%) }
-            30% { transform:translate(3%, -15%) }
-            50% { transform:translate(12%, 9%) }
-            70% { transform:translate(9%, 4%) }
-            90% { transform:translate(-10%, 10%) }
+            10% { transform:translate(-2%, -5%) }
+            20% { transform:translate(5%, 2%) }
+            30% { transform:translate(-5%, 8%) }
+            40% { transform:translate(10%, -10%) }
+            50% { transform:translate(-10%, 5%) }
+            60% { transform:translate(5%, -5%) }
+            70% { transform:translate(-2%, 10%) }
+            80% { transform:translate(8%, -2%) }
+            90% { transform:translate(-5%, -8%) }
         }
 
-        /* Glass Textures */
+        /* Reveal System */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Archival Photo Frame */
+        .archive-photo {
+            position: relative;
+            padding: 12px;
+            background: white;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.05);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .archive-photo::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border: 1px solid rgba(0,0,0,0.03);
+            pointer-events: none;
+        }
+
+        /* Custom Cursor */
+        @media (pointer: fine) {
+            body { cursor: none; }
+            #cursor {
+                position: fixed;
+                width: 4px;
+                height: 4px;
+                background: var(--raw-ochre);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99999;
+            }
+            #cursor-follower {
+                position: fixed;
+                width: 40px;
+                height: 40px;
+                border: 0.5px solid var(--raw-ochre);
+                background: rgba(142, 78, 53, 0.05);
+                backdrop-filter: blur(1px);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 99998;
+                transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+        }
+
+        /* Museum Glass */
         .museum-glass {
-            background: rgba(255, 255, 255, 0.5);
-            backdrop-filter: blur(15px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+            background: rgba(242, 237, 228, 0.75);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
         }
 
-        /* High-End Hover Effects */
-        .image-zoom-container {
-            overflow: hidden;
-            background: #E5E1DA;
+        /* Ink Bleed Typography */
+        .ink-bleed {
+            text-shadow: 0 0 1px rgba(0,0,0,0.1);
         }
-        .image-zoom-container img {
-            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
-        }
-        .image-zoom-container:hover img {
-            transform: scale(1.08);
-            opacity: 0.9;
+
+        /* Scanned Grid */
+        .scanlines {
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.02) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
+            background-size: 100% 3px, 3px 100%;
+            pointer-events: none;
+            z-index: 996;
+            position: fixed;
+            inset: 0;
         }
     </style>
     <script type="importmap">
@@ -153,6 +174,9 @@
 <body class="noise">
     <div id="cursor"></div>
     <div id="cursor-follower"></div>
+    <div class="vignette"></div>
+    <div class="vintage-tint"></div>
+    <div class="scanlines"></div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
@@ -170,34 +194,38 @@
             });
 
             const animate = () => {
-                cursorX += (mouseX - cursorX) * 0.2;
-                cursorY += (mouseY - cursorY) * 0.2;
-                followerX += (mouseX - followerX) * 0.1;
-                followerY += (mouseY - followerY) * 0.1;
+                cursorX += (mouseX - cursorX) * 0.25;
+                cursorY += (mouseY - cursorY) * 0.25;
+                followerX += (mouseX - followerX) * 0.12;
+                followerY += (mouseY - followerY) * 0.12;
 
                 cursor.style.left = cursorX + 'px';
                 cursor.style.top = cursorY + 'px';
-                follower.style.left = (followerX - 18) + 'px';
-                follower.style.top = (followerY - 18) + 'px';
+                follower.style.left = (followerX - 20) + 'px';
+                follower.style.top = (followerY - 20) + 'px';
 
                 requestAnimationFrame(animate);
             };
             animate();
 
             document.addEventListener('mousedown', () => {
-                follower.style.transform = 'scale(0.8)';
-                cursor.style.transform = 'scale(1.5)';
+                follower.style.transform = 'scale(0.7)';
             });
             document.addEventListener('mouseup', () => {
                 follower.style.transform = 'scale(1)';
-                cursor.style.transform = 'scale(1)';
             });
         }
 
         const addHoverEvents = () => {
-            document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
-                el.addEventListener('mouseenter', () => follower.style.transform = 'scale(1.5) rotate(45deg)');
-                el.addEventListener('mouseleave', () => follower.style.transform = 'scale(1) rotate(0deg)');
+            document.querySelectorAll('a, button, input').forEach(el => {
+                el.addEventListener('mouseenter', () => {
+                    follower.style.transform = 'scale(1.5)';
+                    follower.style.background = 'rgba(142, 78, 53, 0.1)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    follower.style.transform = 'scale(1)';
+                    follower.style.background = 'rgba(142, 78, 53, 0.05)';
+                });
             });
         };
         const observer = new MutationObserver(addHoverEvents);
