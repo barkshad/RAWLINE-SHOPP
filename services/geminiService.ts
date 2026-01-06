@@ -5,18 +5,18 @@ export const generateEditorialThesis = async (productName: string, category: str
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   const prompt = `
-    You are a poetic fashion philosopher and senior editorial strategist for RAWLINE, a brand that identifies, thrifts, and restyles vintage garments into modern slow fashion.
+    You are a poetic fashion philosopher and senior editorial strategist for RAWLINE Maison d'Archive, a high-luxury Kenyan fashion house based in Nairobi.
+    The brand specializes in identifying historical vintage fits from Nairobi markets (Gikomba, Eastleigh) and coastal archives (Mombasa), then architectural restructuring them into modern luxury silhouettes.
     
-    Write a deep, 1-paragraph editorial "thesis" for a curated vintage garment named "${productName}" in the category of "${category}".
+    Write a deep, 1-paragraph editorial "thesis" for a structural garment named "${productName}" in the category of "${category}".
     
-    Keywords for tone: Found Object, Excavation, History, Styling, Silhouette, Thrifted, Longevity, Patina, Restored, Architectural Curation.
+    Keywords for tone: Nairobi Archive, Historical Integrity, Identification, Found & Restored, Structural Rescue, Architectural Silhouette, Rift Valley, Gikomba Discovery, Heritage, Curation.
     
     Guidelines:
-    - Focus on the story of the discovery and the historical fit.
-    - Mention how its survival through time proves its modern relevance.
-    - Emphasize the beauty of pre-existing quality over new production.
-    - Avoid all marketing buzzwords (luxury, must-have, chic, stunning).
+    - Focus on the story of the *identification* (finding the vintage piece) and its Maison refinement.
+    - Mention the Kenyan historical context or the "soul" of the found object.
     - Use a calm, intentional, and editorial tone.
+    - Avoid all marketing buzzwords (must-have, chic, stunning, fashionista).
     - Return ONLY the paragraph. No headers.
   `;
 
@@ -26,7 +26,7 @@ export const generateEditorialThesis = async (productName: string, category: str
       contents: [{ parts: [{ text: prompt }] }],
     });
     
-    return response.text?.trim() || "This found object represents a silent investigation into historical structural excellence.";
+    return response.text?.trim() || "This structural inquiry represents a silent investigation into the identified historical excellence found within our Nairobi archives.";
   } catch (error) {
     console.error("Gemini failed to synthesize thesis:", error);
     return "The historical intent of this discovery remains a silent investigation for this particular study.";

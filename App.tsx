@@ -11,7 +11,7 @@ import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 import { Product } from './types';
 import { INITIAL_PRODUCTS } from './constants';
-import { Menu, X, ArrowUpRight } from 'lucide-react';
+import { Menu, X, ArrowUpRight, ShoppingBag } from 'lucide-react';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -38,11 +38,9 @@ const useScrollReveal = () => {
       });
     }, observerOptions);
 
-    // Initial reveal elements
     const revealElements = document.querySelectorAll('.reveal');
     revealElements.forEach(el => observer.observe(el));
 
-    // Dynamic handling for route changes
     const timer = setTimeout(() => {
       const newElements = document.querySelectorAll('.reveal');
       newElements.forEach(el => observer.observe(el));
@@ -70,7 +68,6 @@ const Header = () => {
     setMenuOpen(false);
   }, [pathname]);
 
-  // Lock body scroll when menu is open
   useEffect(() => {
     if (menuOpen) {
       document.body.style.overflow = 'hidden';
@@ -82,104 +79,108 @@ const Header = () => {
     };
   }, [menuOpen]);
 
-  const navLinks = [
-    { name: 'Registry', path: '/archive' },
+  const navLinksLeft = [
+    { name: 'The Findings', path: '/archive' },
     { name: 'Philosophy', path: '/philosophy' },
-    { name: 'Process', path: '/process' },
+  ];
+
+  const navLinksRight = [
+    { name: 'Restoration', path: '/process' },
     { name: 'Journal', path: '/notes' },
   ];
 
   return (
     <>
-      {/* Backdrop Fade Effect */}
       <div 
-        className={`fixed inset-0 z-[55] bg-[#1A1C1E]/40 backdrop-blur-[2px] transition-opacity duration-700 ease-in-out ${
+        className={`fixed inset-0 z-[55] bg-black/60 backdrop-blur-[10px] transition-opacity duration-700 ease-in-out ${
           menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
         }`}
         onClick={() => setMenuOpen(false)}
       />
 
       <header 
-        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-700 ease-in-out ${
-          scrolled ? 'glass py-4 shadow-sm' : 'bg-transparent py-8 md:py-12'
+        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-1000 ease-in-out ${
+          scrolled ? 'museum-glass py-4 shadow-xl' : 'bg-transparent py-10 md:py-16'
         }`}
       >
-        <div className="max-w-[1700px] mx-auto px-6 md:px-12 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3 group relative z-[110]">
-            <div className={`w-4 h-4 md:w-5 md:h-5 border border-black/20 flex items-center justify-center group-hover:bg-black transition-all duration-500 ${menuOpen ? 'border-black' : ''}`}>
-               <div className={`w-1 h-1 rounded-full transition-colors duration-500 ${menuOpen ? 'bg-black' : 'bg-black/40 group-hover:bg-white'}`}></div>
-            </div>
-            <span className={`mono text-[10px] md:text-[11px] font-bold tracking-[0.4em] uppercase transition-colors duration-500 ${menuOpen ? 'text-black' : 'text-current'}`}>RAWLINE</span>
-          </Link>
-
-          <nav className="hidden lg:flex items-center gap-12">
-            {navLinks.map((link) => (
+        <div className="max-w-[1920px] mx-auto px-8 md:px-16 flex justify-between items-center">
+          <nav className="hidden lg:flex items-center gap-12 w-1/3">
+            {navLinksLeft.map((link) => (
               <Link 
                 key={link.path} 
                 to={link.path}
-                className={`text-[10px] mono uppercase tracking-[0.2em] font-medium transition-all ${
-                  pathname === link.path ? 'text-[#1B3B5A] border-b-2 border-[#1B3B5A] pb-1' : 'text-[#1A1C1E]/40 hover:text-[#1B3B5A]'
+                className={`text-[10px] mono uppercase tracking-[0.4em] font-black transition-all ${
+                  pathname === link.path ? 'text-[#A65D3C]' : 'text-black/40 hover:text-black'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
-            <div className="h-4 w-[1px] bg-black/10 mx-2"></div>
-            <Link to="/admin" className="text-[10px] mono uppercase tracking-[0.2em] font-bold text-[#1B3B5A] hover:text-[#B3704C] transition-colors">
-              Internal
-            </Link>
           </nav>
 
-          <button 
-            className="lg:hidden p-2 relative z-[110] transition-transform duration-300 hover:scale-110 active:scale-95"
-            onClick={() => setMenuOpen(!menuOpen)}
-            aria-label="Toggle Navigation"
-          >
-            {menuOpen ? <X size={24} className="text-black" /> : <Menu size={24} />}
-          </button>
+          <div className="flex-grow flex justify-center lg:w-1/3">
+            <Link to="/" className="flex flex-col items-center gap-1 group relative z-[110]">
+              <div className="flex items-center gap-2">
+                 <span className={`mono text-[14px] md:text-[20px] font-black tracking-[1em] uppercase transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`}>RAWLINE</span>
+              </div>
+              <span className={`mono text-[7px] tracking-[0.6em] uppercase opacity-40 transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`}>MAISON D'ARCHIVE • NAIROBI</span>
+            </Link>
+          </div>
+
+          <div className="flex items-center justify-end gap-12 w-1/3">
+             <nav className="hidden lg:flex items-center gap-12">
+               {navLinksRight.map((link) => (
+                 <Link 
+                   key={link.path} 
+                   to={link.path}
+                   className={`text-[10px] mono uppercase tracking-[0.4em] font-black transition-all ${
+                     pathname === link.path ? 'text-[#A65D3C]' : 'text-black/40 hover:text-black'
+                   }`}
+                 >
+                   {link.name}
+                 </Link>
+               ))}
+             </nav>
+             <button className="hidden sm:flex items-center gap-2 text-[10px] mono uppercase tracking-widest font-black text-black/40 hover:text-black transition-colors">
+                <ShoppingBag size={16} />
+                <span className="hidden xl:inline">The Boutique</span>
+             </button>
+             <button 
+               className="lg:hidden p-2 relative z-[110] transition-transform duration-300 hover:scale-110 active:scale-95"
+               onClick={() => setMenuOpen(!menuOpen)}
+               aria-label="Toggle Navigation"
+             >
+               {menuOpen ? <X size={28} className="text-white" /> : <Menu size={28} />}
+             </button>
+          </div>
         </div>
       </header>
 
-      {/* Mobile Menu Overlay */}
       <div 
-        className={`fixed inset-0 z-[60] bg-[#F5F2EE] transition-transform duration-[800ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] transform ${
-          menuOpen ? 'translate-y-0' : '-translate-y-full'
+        className={`fixed inset-0 z-[60] bg-[#121212] transition-all duration-[1000ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] transform ${
+          menuOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
       >
-        <div className="p-8 md:p-16 h-full flex flex-col justify-between pt-40 md:pt-48">
-          <nav className="flex flex-col gap-6 md:gap-8">
-            <span className={`mono text-[10px] font-bold text-[#B3704C]/30 tracking-[0.5em] mb-4 transition-all duration-700 delay-100 ${menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>STUDIO_NAV_INDEX</span>
-            {navLinks.map((link, index) => (
+        <div className="p-8 md:p-24 h-full flex flex-col justify-center items-center text-center">
+          <nav className="flex flex-col gap-8 md:gap-16">
+            {[...navLinksLeft, ...navLinksRight].map((link, index) => (
               <Link 
                 key={link.path} 
                 to={link.path} 
                 style={{ transitionDelay: `${200 + index * 100}ms` }}
-                className={`text-5xl md:text-8xl serif italic transition-all duration-700 ${
-                  menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-                } ${pathname === link.path ? 'text-[#1B3B5A]' : 'text-[#1A1C1E]/20 hover:text-[#B3704C]'}`}
+                className={`text-5xl md:text-[10vh] serif italic transition-all duration-700 font-light tracking-tighter ${
+                  menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-20'
+                } ${pathname === link.path ? 'text-[#A65D3C]' : 'text-white/20 hover:text-white'}`}
               >
                 {link.name}
               </Link>
             ))}
           </nav>
           
-          <div 
-            className={`pb-12 border-t pt-10 border-[#1B3B5A]/5 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 transition-all duration-700 delay-500 ${
-              menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-            }`}
-          >
-            <div className="space-y-4">
-              <Link to="/admin" className="text-sm mono uppercase tracking-widest text-[#1B3B5A] font-bold hover:text-[#B3704C] transition-colors">
-                Access Restricted Database
-              </Link>
-              <div className="flex gap-10 mono text-[10px] uppercase tracking-widest text-[#1A1C1E]/30">
-                  <span>Berlin, DE</span>
-                  <span>EST 2024</span>
-              </div>
-            </div>
-            <p className="max-w-xs text-[10px] mono uppercase tracking-widest leading-loose text-[#1A1C1E]/30 text-left md:text-right italic">
-              A registry of historical findings and curated silhouettes for the long line.
-            </p>
+          <div className={`mt-24 transition-all duration-1000 delay-700 ${menuOpen ? 'opacity-100' : 'opacity-0'}`}>
+             <Link to="/admin" className="mono text-[10px] text-white/30 hover:text-[#A65D3C] tracking-[0.5em] uppercase font-black transition-colors">
+               RESTRICTED_ARCHIVE_ACCESS
+             </Link>
           </div>
         </div>
       </div>
@@ -188,72 +189,71 @@ const Header = () => {
 };
 
 const Footer = () => (
-  <footer className="bg-white border-t border-black/5 py-24 md:py-32 overflow-hidden">
-    <div className="max-w-[1700px] mx-auto px-6 md:px-12">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
-        <div className="lg:col-span-5 space-y-10">
-           <Link to="/" className="flex items-center gap-4">
-              <div className="w-5 h-5 border border-black/20 flex items-center justify-center">
-                <div className="w-1 h-1 bg-black rounded-full"></div>
-              </div>
-              <span className="mono text-xs font-bold tracking-[0.6em]">RAWLINE</span>
+  <footer className="bg-[#121212] text-white py-32 md:py-48 overflow-hidden">
+    <div className="max-w-[1800px] mx-auto px-8 md:px-16">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
+        <div className="lg:col-span-4 space-y-12">
+           <Link to="/" className="flex flex-col gap-2">
+              <span className="mono text-2xl font-black tracking-[0.8em] uppercase">RAWLINE</span>
+              <span className="mono text-[10px] tracking-[0.4em] uppercase text-white/30">Maison d'Archive Nairobi</span>
            </Link>
-           <p className="max-w-md text-xl md:text-2xl text-editorial text-gray-400 font-light italic serif leading-relaxed">
-             A study in structural honesty. We celebrate the beauty of construction, the silence of the muslin, and the longevity of resolved form.
+           <p className="max-w-md text-xl md:text-2xl text-white/40 font-light italic serif leading-relaxed">
+             A high-luxury investigation into Kenya's historical silhouettes. We identify, rescue, and restructure the findings of our heritage for the next generation.
            </p>
         </div>
         
-        <div className="lg:col-span-7 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-12">
-           <div className="space-y-8">
-             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Navigation</h4>
-             <ul className="space-y-4 text-[11px] mono uppercase tracking-[0.2em] font-medium">
-               <li><Link to="/archive" className="hover:text-[#1B3B5A] transition-colors">Archive</Link></li>
-               <li><Link to="/philosophy" className="hover:text-[#1B3B5A] transition-colors">Manifesto</Link></li>
-               <li><Link to="/process" className="hover:text-[#1B3B5A] transition-colors">Methods</Link></li>
-               <li><Link to="/notes" className="hover:text-[#1B3B5A] transition-colors">Journal</Link></li>
+        <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-3 gap-16">
+           <div className="space-y-10">
+             <h4 className="mono text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">The Archive</h4>
+             <ul className="space-y-5 text-[11px] mono uppercase tracking-[0.3em] font-black text-white/50">
+               <li><Link to="/archive" className="hover:text-white transition-colors">The Findings</Link></li>
+               <li><Link to="/philosophy" className="hover:text-white transition-colors">Our Manifesto</Link></li>
+               <li><Link to="/process" className="hover:text-white transition-colors">Restoration Logic</Link></li>
              </ul>
            </div>
-           <div className="space-y-8">
-             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Connect</h4>
-             <ul className="space-y-4 text-[11px] mono uppercase tracking-[0.2em] font-medium">
-               <li><a href="#" className="hover:text-[#1B3B5A] flex items-center gap-2">Studio Dispatch <ArrowUpRight size={12} /></a></li>
-               <li><a href="#" className="hover:text-[#1B3B5A] flex items-center gap-2">Coordinates <ArrowUpRight size={12} /></a></li>
+           <div className="space-y-10">
+             <h4 className="mono text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Services</h4>
+             <ul className="space-y-5 text-[11px] mono uppercase tracking-[0.3em] font-black text-white/50">
+               <li><a href="#" className="hover:text-white">Shipping</a></li>
+               <li><a href="#" className="hover:text-white">Authentication</a></li>
+               <li><a href="#" className="hover:text-white">Bespoke Fitting</a></li>
              </ul>
            </div>
-           <div className="space-y-8">
-             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Dispatch</h4>
-             <div className="relative">
+           <div className="space-y-10">
+             <h4 className="mono text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Nairobi Studio</h4>
+             <div className="relative group">
                 <input 
                   type="email" 
-                  placeholder="Enter Coordinate (Email)" 
-                  className="w-full bg-transparent border-b border-black/10 py-3 mono text-[10px] uppercase tracking-widest outline-none focus:border-black transition-colors"
+                  placeholder="Registry Alerts" 
+                  className="w-full bg-transparent border-b border-white/10 py-4 mono text-[10px] uppercase tracking-widest outline-none focus:border-[#A65D3C] transition-colors"
                 />
+                <button className="absolute right-0 bottom-4 text-white/20 group-hover:text-white transition-colors">
+                  <ArrowUpRight size={16} />
+                </button>
              </div>
            </div>
         </div>
       </div>
       
-      <div className="mt-32 pt-12 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-8">
-        <span className="mono text-[9px] uppercase tracking-[0.3em] text-gray-300">© 2024 RAWLINE STUDIO. ALL RECORDS DOCUMENTED.</span>
-        <div className="flex flex-wrap justify-center items-center gap-8 mono text-[9px] uppercase tracking-[0.3em] text-gray-300">
-           <span className="text-[#1B3B5A] font-bold">52.5200° N, 13.4050° E</span>
-           <span className="hidden md:inline h-3 w-[1px] bg-black/10"></span>
-           <span>Berlin Registry No. 00-24</span>
+      <div className="mt-40 pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
+        <span className="mono text-[9px] uppercase tracking-[0.4em] text-white/20">© 2024 RAWLINE MAISON D'ARCHIVE. NAIROBI.</span>
+        <div className="flex flex-wrap justify-center items-center gap-12 mono text-[9px] uppercase tracking-[0.4em] text-white/20">
+           <span className="text-[#A65D3C] font-black">Nairobi • Paris • Tokyo</span>
+           <span>EST 2024</span>
         </div>
       </div>
     </div>
   </footer>
 );
 
-// New inner component to handle hooks that depend on Router context
 const AppContent: React.FC<{ products: Product[]; addProduct: (p: Product) => void }> = ({ products, addProduct }) => {
   useScrollReveal();
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-[#1B3B5A] selection:text-white">
+    <div className="min-h-screen flex flex-col selection:bg-[#A65D3C] selection:text-white">
       <ScrollToTop />
       <Header />
-      <main className="flex-grow pt-24 md:pt-32">
+      <main className="flex-grow">
         <Routes>
           <Route path="/" element={<Home products={products} />} />
           <Route path="/archive" element={<Archive products={products} />} />
@@ -273,7 +273,7 @@ const AppContent: React.FC<{ products: Product[]; addProduct: (p: Product) => vo
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(() => {
     try {
-      const saved = localStorage.getItem('rawline_registry_v3');
+      const saved = localStorage.getItem('rawline_registry_v4');
       return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
     } catch (e) {
       console.error("Failed to parse local storage", e);
@@ -284,7 +284,7 @@ const App: React.FC = () => {
   const addProduct = (product: Product) => {
     const updated = [product, ...products];
     setProducts(updated);
-    localStorage.setItem('rawline_registry_v3', JSON.stringify(updated));
+    localStorage.setItem('rawline_registry_v4', JSON.stringify(updated));
   };
 
   return (

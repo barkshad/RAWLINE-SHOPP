@@ -8,16 +8,15 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --raw-bg: #F5F2EE;
-            --raw-ink: #1A1C1E;
-            --raw-clay: #D4C7B0;
+            --raw-bg: #F8F6F3;
+            --raw-ink: #121212;
+            --raw-clay: #C4B59D;
             --raw-mineral: #1B3B5A;
-            --raw-ochre: #B3704C;
-            --raw-moss: #5D6D5E;
-            --raw-parchment: #EBE6DF;
+            --raw-ochre: #A65D3C;
+            --raw-moss: #4A5D4B;
         }
         
         body {
@@ -26,41 +25,31 @@
             color: var(--raw-ink);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+            letter-spacing: -0.01em;
         }
 
-        /* Massive Fluid Typography for Hero */
+        /* Fluid Editorial Typography */
         .hero-title {
-            font-size: clamp(4rem, 15vw, 18rem);
-            line-height: 0.8;
-            letter-spacing: -0.05em;
+            font-size: clamp(3.5rem, 16vw, 20rem);
+            line-height: 0.78;
+            letter-spacing: -0.06em;
+            font-weight: 400;
         }
 
         .serif { font-family: 'Playfair Display', serif; }
         .mono { font-family: 'Space Mono', monospace; }
-        
-        .text-editorial {
-            line-height: 1.7;
-            letter-spacing: -0.015em;
-        }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--raw-parchment); }
-        ::-webkit-scrollbar-thumb { background: var(--raw-clay); }
+        /* Custom Scrollbar - Minimalist */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0,0,0,0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--raw-ochre); }
 
-        .glass {
-            background: rgba(245, 242, 238, 0.9);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(27, 59, 90, 0.05);
-        }
-
-        /* Reveal System */
+        /* Reveal System - Smoother cubic-bezier */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(60px);
+            transition: opacity 1.6s cubic-bezier(0.16, 1, 0.3, 1), transform 1.6s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
         .reveal.active {
@@ -68,71 +57,81 @@
             transform: translateY(0);
         }
 
-        /* Hero Specific Animations */
-        @keyframes titleReveal {
-            from { transform: translateY(100%); skewY(5deg); opacity: 0; }
-            to { transform: translateY(0) skewY(0); opacity: 1; }
+        /* Perspective for Cards */
+        .perspective-lg {
+            perspective: 2000px;
         }
 
-        .animate-title-reveal {
-            display: inline-block;
-            animation: titleReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-        }
-
-        /* Custom Selection */
-        ::selection {
-            background-color: var(--raw-mineral);
-            color: #ffffff;
-        }
-
-        /* Cursor - only on fine pointers (desktop) */
+        /* Custom Cursor Styling */
         @media (pointer: fine) {
             body { cursor: none; }
             #cursor {
                 position: fixed;
-                width: 8px;
-                height: 8px;
+                width: 6px;
+                height: 6px;
                 background: var(--raw-ochre);
                 border-radius: 50%;
                 pointer-events: none;
-                z-index: 10000;
-                transition: transform 0.1s ease;
+                z-index: 99999;
+                transition: transform 0.15s ease;
             }
             #cursor-follower {
                 position: fixed;
-                width: 32px;
-                height: 32px;
-                border: 1px solid rgba(179, 112, 76, 0.3);
+                width: 36px;
+                height: 36px;
+                border: 0.5px solid rgba(0,0,0,0.1);
+                background: rgba(255,255,255,0.05);
+                backdrop-filter: blur(2px);
                 border-radius: 50%;
                 pointer-events: none;
-                z-index: 10000;
-                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                z-index: 99998;
+                transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             }
         }
-        @media (pointer: coarse) {
-            #cursor, #cursor-follower { display: none; }
-        }
 
-        .cursor-active #cursor { transform: scale(3); opacity: 0.3; }
-        .cursor-active #cursor-follower { transform: scale(1.4); border-color: var(--raw-mineral); }
-
-        /* Grainy Overlay */
-        body::after {
+        /* Animated Grain Layer */
+        .noise::after {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
             pointer-events: none;
-            z-index: 9999;
-            opacity: 0.04;
+            z-index: 999;
+            opacity: 0.05;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
+            animation: grain 8s steps(10) infinite;
         }
 
-        /* Subtle Section Gradients */
-        .bg-mineral-soft {
-            background: linear-gradient(135deg, #F5F2EE 0%, #EBE6DF 100%);
+        @keyframes grain {
+            0%, 100% { transform:translate(0, 0) }
+            10% { transform:translate(-5%, -10%) }
+            30% { transform:translate(3%, -15%) }
+            50% { transform:translate(12%, 9%) }
+            70% { transform:translate(9%, 4%) }
+            90% { transform:translate(-10%, 10%) }
+        }
+
+        /* Glass Textures */
+        .museum-glass {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+        }
+
+        /* High-End Hover Effects */
+        .image-zoom-container {
+            overflow: hidden;
+            background: #E5E1DA;
+        }
+        .image-zoom-container img {
+            transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1), opacity 1s ease;
+        }
+        .image-zoom-container:hover img {
+            transform: scale(1.08);
+            opacity: 0.9;
         }
     </style>
     <script type="importmap">
@@ -151,7 +150,7 @@
 }
 </script>
 </head>
-<body>
+<body class="noise">
     <div id="cursor"></div>
     <div id="cursor-follower"></div>
     <div id="root"></div>
@@ -161,28 +160,49 @@
         const follower = document.getElementById('cursor-follower');
         
         if (window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+            let followerX = 0, followerY = 0;
+
             document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-                setTimeout(() => {
-                    follower.style.left = (e.clientX - 16) + 'px';
-                    follower.style.top = (e.clientY - 16) + 'px';
-                }, 60);
+                mouseX = e.clientX;
+                mouseY = e.clientY;
             });
 
-            document.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
-            document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+            const animate = () => {
+                cursorX += (mouseX - cursorX) * 0.2;
+                cursorY += (mouseY - cursorY) * 0.2;
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                follower.style.left = (followerX - 18) + 'px';
+                follower.style.top = (followerY - 18) + 'px';
+
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+            document.addEventListener('mousedown', () => {
+                follower.style.transform = 'scale(0.8)';
+                cursor.style.transform = 'scale(1.5)';
+            });
+            document.addEventListener('mouseup', () => {
+                follower.style.transform = 'scale(1)';
+                cursor.style.transform = 'scale(1)';
+            });
         }
-        
-        const updateHoverState = () => {
+
+        const addHoverEvents = () => {
             document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-active'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-active'));
+                el.addEventListener('mouseenter', () => follower.style.transform = 'scale(1.5) rotate(45deg)');
+                el.addEventListener('mouseleave', () => follower.style.transform = 'scale(1) rotate(0deg)');
             });
         };
-        const observer = new MutationObserver(updateHoverState);
+        const observer = new MutationObserver(addHoverEvents);
         observer.observe(document.body, { childList: true, subtree: true });
-        updateHoverState();
+        addHoverEvents();
     </script>
 </body>
 </html>
