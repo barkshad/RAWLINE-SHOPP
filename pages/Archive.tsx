@@ -3,7 +3,7 @@ import React, { useState, useMemo } from 'react';
 import { Link } from 'react-router-dom';
 import { Product } from '../types';
 import { CATEGORIES } from '../constants';
-import { Search, ListFilter, Grid3X3, ArrowUpRight, LayoutGrid, LayoutList, Fingerprint } from 'lucide-react';
+import { Search, LayoutGrid, LayoutList, Fingerprint } from 'lucide-react';
 
 interface ArchiveProps {
   products: Product[];
@@ -15,9 +15,12 @@ const Archive: React.FC<ArchiveProps> = ({ products }) => {
   const [viewMode, setViewMode] = useState<'grid' | 'editorial'>('grid');
 
   const filteredProducts = useMemo(() => {
+    if (!Array.isArray(products)) return [];
     return products.filter(p => {
+      if (!p) return false;
       const matchesCat = activeCategory === 'All' || p.category === activeCategory;
-      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+      const matchesSearch = (p.name || '').toLowerCase().includes(search.toLowerCase()) || 
+                           (p.description || '').toLowerCase().includes(search.toLowerCase());
       return matchesCat && matchesSearch;
     });
   }, [products, activeCategory, search]);
@@ -91,7 +94,7 @@ const Archive: React.FC<ArchiveProps> = ({ products }) => {
               <Link to={`/product/${product.id}`} className="block space-y-10">
                 <div className="image-zoom-container aspect-[3/4.2] rounded-sm relative border border-black/5 shadow-xl bg-white">
                   <img 
-                    src={product.images[0]} 
+                    src={product.images?.[0] || 'https://picsum.photos/400/600'} 
                     alt={product.name} 
                     className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:grayscale-0"
                   />
@@ -118,7 +121,7 @@ const Archive: React.FC<ArchiveProps> = ({ products }) => {
             <div key={product.id} className="reveal" style={{ transitionDelay: `${i * 0.1}s` }}>
               <Link to={`/product/${product.id}`} className="group grid grid-cols-1 md:grid-cols-12 gap-16 items-center">
                 <div className="md:col-span-5 aspect-[4/5] overflow-hidden rounded-sm shadow-2xl bg-white">
-                   <img src={product.images[0]} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" />
+                   <img src={product.images?.[0] || 'https://picsum.photos/400/600'} className="w-full h-full object-cover grayscale opacity-80 group-hover:grayscale-0 group-hover:scale-105 transition-all duration-1000" />
                 </div>
                 <div className="md:col-span-7 space-y-12">
                    <div className="space-y-4">

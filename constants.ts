@@ -1,5 +1,5 @@
 
-import { Product } from './types';
+import { Product, SiteContent } from './types';
 
 export const COLORS = {
   parchment: '#F2EDE4', /* Tea-stained paper */
@@ -37,33 +37,60 @@ export const INITIAL_PRODUCTS: Product[] = [
     images: ['https://picsum.photos/1000/1500?random=420', 'https://picsum.photos/1000/1500?random=421'],
     status: 'published',
     createdAt: Date.now() - 86400000
-  },
-  {
-    id: 'RL-ARCH-003',
-    name: 'Colonial Era Naval Knit',
-    category: 'Tops',
-    price: 950,
-    description: 'Recovered from Mombasa naval stores. Heavy-density virgin wool with hand-linked neck restoration.',
-    editorial: `Recovered from the coastal archives of Mombasa, this heavy naval knit represents a lost era of textile density. The Maison has hand-restored the collar and cuffs, maintaining the original 'salt-worn' character while ensuring the structural geometry meets modern luxury standards.`,
-    fabric: '100% Boiled Virgin Wool. Hand-linked restoration.',
-    fit: 'Structured close-to-body vintage silhouette.',
-    images: ['https://picsum.photos/1000/1500?random=430', 'https://picsum.photos/1000/1500?random=431'],
-    status: 'published',
-    createdAt: Date.now() - 172800000
-  },
-  {
-    id: 'RL-ARCH-004',
-    name: 'Post-Independence Cuir',
-    category: 'Outerwear',
-    price: 3200,
-    description: 'Deconstructed 1960s hide. Restructured using Nairobi-architectural pattern logic.',
-    editorial: `A study in historical resilience. We identified this 1960s leather hide in a private estate in Karen. Its seasoned patina tells a story of Kenya's early independence era. We have deconstructed the original garment and re-stated its purpose as a modular vest, utilizing zero-waste patterns to preserve every inch of the archival leather.`,
-    fabric: '100% Full-Grain Archival Hide. Natural Shea Butter finish.',
-    fit: 'Cropped Modular Architecture. Original industrial hardware.',
-    images: ['https://picsum.photos/1000/1500?random=440', 'https://picsum.photos/1000/1500?random=441'],
-    status: 'published',
-    createdAt: Date.now() - 259200000
   }
 ];
+
+export const INITIAL_SITE_CONTENT: SiteContent = {
+  brand: {
+    name: "RAWLINE",
+    subBrand: "MAISON D'ARCHIVE",
+    location: "NAIROBI",
+    description: "A high-luxury investigation into Kenya's historical silhouettes. We identify, rescue, and restructure the findings of our heritage for the next generation.",
+    heroTitle: "Found & Restored.",
+    heroSubtitle: "Documenting the structural soul of Kenya",
+    manifestoQuote: "We identify historical excellence and re-state its purpose for the next 50 years. True luxury is the longevity of the found form."
+  },
+  philosophy: {
+    title: "Philosophy of the Found Fit.",
+    documentId: "Document 01 — Manifest",
+    mainParagraph: "RAWLINE rejects the cycle of mass production. We believe that the world already contains all the beautiful clothing it needs. Our mission is to identify, rescue, and restyle found objects into a modern slow-fashion narrative.",
+    sec1Title: "Curation over Creation",
+    sec1Content: "To find a 40-year-old garment with perfect structural integrity and a soul earned through use is far more rewarding than making something new. Our registry is a study in longevity.",
+    sec2Content: "By thrifting historical fits, we promote a lifestyle that values history, quality, and the environmental necessity of re-use.",
+    quote: "The most sustainable garment is the one that already exists.",
+    footerTitle: "Curation is our quiet protest.",
+    footerContent: "RAWLINE does not participate in the seasonal calendar. We follow the calendar of discovery. We identify historical excellence and style it for today's quiet investigation of form."
+  },
+  process: {
+    title: "Identification Process.",
+    documentId: "Document 03 — Methodology",
+    steps: [
+      {
+        id: 'step-1',
+        title: 'Step 01 — Identification',
+        description: 'We scour deadstock archives and vintage markets for historical silhouettes. We look for structural integrity, material quality, and the "long line"—garments that have already survived for decades.',
+        image: 'https://picsum.photos/1000/1500?random=190'
+      },
+      {
+        id: 'step-2',
+        title: 'Step 02 — Restoration & Styling',
+        description: 'Once found, a piece is steam-restored and its story is documented. We style it for a modern context, proving that a thrifted high-quality fit is more relevant today than any seasonal trend.',
+        image: 'https://picsum.photos/1000/1500?random=191'
+      }
+    ]
+  },
+  notes: {
+    title: "Registry Notes.",
+    documentId: "Document 04 — Journal",
+    entries: [
+      {
+        id: 'note-1',
+        title: 'On Restraint',
+        date: 'OCTOBER 12, 2024',
+        content: 'Restraint is the hardest discipline. To leave a hem raw is to admit it is already enough. To leave a seam exposed is to celebrate the labor. We are constantly learning to trust the material to speak for itself.'
+      }
+    ]
+  }
+};
 
 export const CATEGORIES = ['All', 'Tops', 'Bottoms', 'Outerwear', 'Accessories'];

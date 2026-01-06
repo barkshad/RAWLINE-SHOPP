@@ -2,7 +2,16 @@
 import { GoogleGenAI } from "@google/genai";
 
 export const generateEditorialThesis = async (productName: string, category: string): Promise<string> => {
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Use the standard environment variable. Vite's `define` config will replace this string literal
+  // at build time with the actual key, avoiding the need for a runtime `process` object in the browser.
+  const apiKey = process.env.API_KEY;
+
+  if (!apiKey || apiKey === '') {
+    console.warn("API_KEY missing or empty. Returning fallback editorial.");
+    return "The historical intent of this discovery remains a silent investigation for this particular study. [API Key Missing]";
+  }
+
+  const ai = new GoogleGenAI({ apiKey });
   
   const prompt = `
     You are a poetic fashion philosopher and senior editorial strategist for RAWLINE Maison d'Archive, a high-luxury Kenyan fashion house based in Nairobi.
