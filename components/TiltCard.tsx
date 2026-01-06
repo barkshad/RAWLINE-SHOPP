@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback } from 'react';
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 
 interface TiltCardProps {
   children: React.ReactNode;
@@ -8,29 +8,34 @@ interface TiltCardProps {
 
 export const TiltCard: React.FC<TiltCardProps> = ({ children, className = "" }) => {
   const [rotate, setRotate] = useState({ x: 0, y: 0 });
+  const [isTouch, setIsTouch] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const checkTouch = () => {
+      setIsTouch('ontouchstart' in window || navigator.maxTouchPoints > 0);
+    };
+    checkTouch();
+  }, []);
+
   const onMouseMove = useCallback((e: React.MouseEvent<HTMLDivElement>) => {
-    if (!cardRef.current) return;
+    if (!cardRef.current || isTouch) return;
 
     const rect = cardRef.current.getBoundingClientRect();
     const width = rect.width;
     const height = rect.height;
     
-    // Relative mouse position from 0 to 1
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
 
-    // Convert to -0.5 to 0.5 range
     const xPct = mouseX / width - 0.5;
     const yPct = mouseY / height - 0.5;
 
-    // Rotation values (max 10 degrees)
     setRotate({
-      x: -yPct * 20, // Negative because top needs positive rotateX to tilt back
-      y: xPct * 20
+      x: -yPct * 12, 
+      y: xPct * 12
     });
-  }, []);
+  }, [isTouch]);
 
   const onMouseLeave = useCallback(() => {
     setRotate({ x: 0, y: 0 });
@@ -41,15 +46,19 @@ export const TiltCard: React.FC<TiltCardProps> = ({ children, className = "" }) 
       ref={cardRef}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      className={`perspective-1000 ${className}`}
+      className={`relative h-full w-full ${!isTouch ? 'perspective-1000' : ''} ${className}`}
+      style={{ perspective: isTouch ? 'none' : '1200px' }}
     >
       <div
-        className="preserve-3d transition-transform duration-200 ease-out h-full w-full"
+        className="transition-transform duration-500 ease-out h-full w-full will-change-transform"
         style={{
-          transform: `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`
+          transform: isTouch 
+            ? 'none' 
+            : `rotateX(${rotate.x}deg) rotateY(${rotate.y}deg)`,
+          transformStyle: 'preserve-3d'
         }}
       >
-        <div className="h-full w-full" style={{ transform: 'translateZ(20px)' }}>
+        <div className="h-full w-full" style={{ transform: isTouch ? 'none' : 'translateZ(25px)' }}>
           {children}
         </div>
       </div>

@@ -51,13 +51,13 @@ export const INITIAL_PRODUCTS: Product[] = [
   },
   {
     id: 'REF-004',
-    name: 'Remnant Grid Vest',
+    name: 'Modular Grid Vest',
     category: 'Outerwear',
     price: 360,
     description: 'Constructed using a modular grid of production offcuts.',
-    editorial: `Sustainability is often a buzzword. Here, it is a constraint. The Remnant Grid Vest is built from a strict geometric grid of shearling and leather offcuts, ensuring that no material from the cutting room floor is lost to time.`,
+    editorial: `The Modular Grid Vest is built from a strict geometric grid of shearling and leather offcuts, ensuring that no material from the cutting room floor is lost to time. It represents a commitment to zero-waste architectural assembly.`,
     fabric: 'Mixed Origin Leather and Shearling Remnants. Vegetable Tanned.',
-    fit: 'Modular, layer-focused fit. Open side seams with industrial webbing closures.',
+    fit: 'Layer-focused fit. Open side seams with industrial webbing closures.',
     images: ['https://picsum.photos/1000/1500?random=40', 'https://picsum.photos/1000/1500?random=41'],
     status: 'published',
     createdAt: Date.now() - 259200000

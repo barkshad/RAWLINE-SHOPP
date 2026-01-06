@@ -25,8 +25,10 @@
             color: var(--raw-ink);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            cursor: none;
         }
+
+        /* Fluid Typography */
+        h1 { font-size: clamp(2.5rem, 10vw, 10rem); }
 
         .serif { font-family: 'Playfair Display', serif; }
         .mono { font-family: 'Space Mono', monospace; }
@@ -39,10 +41,9 @@
         /* Custom Scrollbar */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: var(--raw-bg); }
-        ::-webkit-scrollbar-thumb { background: #d1d1d1; border-radius: 0px; }
+        ::-webkit-scrollbar-thumb { background: #d1d1d1; }
         ::-webkit-scrollbar-thumb:hover { background: var(--raw-blueprint); }
 
-        /* Glassmorphism */
         .glass {
             background: rgba(253, 252, 251, 0.85);
             backdrop-filter: blur(12px);
@@ -50,7 +51,49 @@
             border-bottom: 1px solid rgba(0, 0, 0, 0.05);
         }
 
-        /* Noise Texture */
+        /* Scroll Reveal Animation System */
+        .reveal {
+            opacity: 0;
+            transform: translateY(40px);
+            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: opacity, transform;
+        }
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Cursor - only on fine pointers (desktop) */
+        @media (pointer: fine) {
+            body { cursor: none; }
+            #cursor {
+                position: fixed;
+                width: 8px;
+                height: 8px;
+                background: black;
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10000;
+                transition: transform 0.1s ease;
+            }
+            #cursor-follower {
+                position: fixed;
+                width: 32px;
+                height: 32px;
+                border: 1px solid rgba(0,0,0,0.15);
+                border-radius: 50%;
+                pointer-events: none;
+                z-index: 10000;
+                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            }
+        }
+        @media (pointer: coarse) {
+            #cursor, #cursor-follower { display: none; }
+        }
+
+        .cursor-active #cursor { transform: scale(3); opacity: 0.3; }
+        .cursor-active #cursor-follower { transform: scale(1.4); border-color: var(--raw-blueprint); }
+
         body::after {
             content: "";
             position: fixed;
@@ -63,38 +106,8 @@
             opacity: 0.03;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
         }
-
-        /* Cursor */
-        #cursor {
-            position: fixed;
-            width: 8px;
-            height: 8px;
-            background: black;
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.1s ease;
-        }
-        #cursor-follower {
-            position: fixed;
-            width: 32px;
-            height: 32px;
-            border: 1px solid rgba(0,0,0,0.15);
-            border-radius: 50%;
-            pointer-events: none;
-            z-index: 10000;
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .cursor-active #cursor { transform: scale(3); opacity: 0.3; }
-        .cursor-active #cursor-follower { transform: scale(1.4); border-color: var(--raw-blueprint); }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .animate-fade-in { animation: fadeIn 0.8s ease forwards; }
     </style>
-<script type="importmap">
+    <script type="importmap">
 {
   "imports": {
     "react": "https://esm.sh/react@18.3.1",
@@ -119,20 +132,22 @@
         const cursor = document.getElementById('cursor');
         const follower = document.getElementById('cursor-follower');
         
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            setTimeout(() => {
-                follower.style.left = (e.clientX - 16) + 'px';
-                follower.style.top = (e.clientY - 16) + 'px';
-            }, 60);
-        });
+        if (window.matchMedia("(pointer: fine)").matches) {
+            document.addEventListener('mousemove', (e) => {
+                cursor.style.left = e.clientX + 'px';
+                cursor.style.top = e.clientY + 'px';
+                setTimeout(() => {
+                    follower.style.left = (e.clientX - 16) + 'px';
+                    follower.style.top = (e.clientY - 16) + 'px';
+                }, 60);
+            });
 
-        document.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
-        document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+            document.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
+            document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+        }
         
         const updateHoverState = () => {
-            document.querySelectorAll('a, button, input, select').forEach(el => {
+            document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
                 el.addEventListener('mouseenter', () => document.body.classList.add('cursor-active'));
                 el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-active'));
             });

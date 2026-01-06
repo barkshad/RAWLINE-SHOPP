@@ -3,51 +3,69 @@ import React from 'react';
 
 const Process: React.FC = () => {
   return (
-    <div className="max-w-[1600px] mx-auto px-6 md:px-12 pt-48 pb-32">
-      <div className="max-w-3xl mx-auto space-y-32">
-        <header className="space-y-8">
-          <h2 className="text-[11px] uppercase tracking-[0.5em] font-bold text-gray-300">Section 03</h2>
-          <h1 className="text-6xl md:text-8xl font-light serif italic tracking-tighter leading-none">Process Over Output</h1>
+    <div className="max-w-[1700px] mx-auto px-8 md:px-16 py-24 md:py-48">
+      <div className="max-w-4xl mx-auto space-y-48">
+        <header className="space-y-12 reveal">
+          <div className="flex items-center gap-8">
+            <span className="w-16 h-[1.5px] bg-black/10"></span>
+            <h2 className="text-[12px] uppercase tracking-[0.8em] font-bold text-gray-300">Document 03 — Methods</h2>
+          </div>
+          <h1 className="text-7xl md:text-[10vw] font-light serif italic tracking-tighter leading-[0.85] text-black/90">
+            Methods of <br /> Construction.
+          </h1>
         </header>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-16">
-          <img src="https://picsum.photos/800/1000?random=88" className="w-full grayscale opacity-70" alt="Process work" />
-          <img src="https://picsum.photos/800/1000?random=89" className="w-full grayscale opacity-70 mt-12 md:mt-24" alt="Process work" />
-        </div>
-
-        <section className="text-editorial space-y-12 text-xl leading-relaxed text-gray-700">
-          <p>
-            Most of what matters happens before the final result. The thinking. The rejecting. The reworking.
-          </p>
-          
-          <p>
-            RAWLINE pays attention to those moments. Process is not something to hide — it’s where meaning is formed.
-          </p>
-
-          <div className="space-y-12 pt-12 border-t border-black/5">
-            <div className="space-y-4">
-               <h3 className="text-[10px] uppercase tracking-widest font-bold">We document thoughts</h3>
-               <p className="text-sm text-gray-500 leading-relaxed">Capturing the evolution of an idea from a single line to a structural reality.</p>
+        <section className="space-y-32 reveal" style={{ transitionDelay: '0.2s' }}>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 md:gap-24">
+            <div className="space-y-12">
+               <div className="aspect-[3/4] overflow-hidden bg-gray-100 shadow-xl rounded-sm">
+                  <img src="https://picsum.photos/1000/1500?random=800" className="w-full h-full object-cover grayscale opacity-80" alt="Process detail" />
+               </div>
+               <div className="space-y-6">
+                 <h3 className="mono text-[11px] font-bold uppercase tracking-[0.4em] text-black/30">Step 01 — The Muslin</h3>
+                 <p className="text-editorial text-xl text-gray-600 leading-relaxed font-light italic serif">
+                   Every piece begins in raw cotton muslin. This is where the tension is discovered. We basting stitch the draft to find the silence between the fabric and the skeleton.
+                 </p>
+               </div>
             </div>
-            <div className="space-y-4">
-               <h3 className="text-[10px] uppercase tracking-widest font-bold">We revisit ideas</h3>
-               <p className="text-sm text-gray-500 leading-relaxed">Returning to discarded drafts to find the essence that was missed the first time.</p>
-            </div>
-            <div className="space-y-4">
-               <h3 className="text-[10px] uppercase tracking-widest font-bold">We allow space for change</h3>
-               <p className="text-sm text-gray-500 leading-relaxed">Creation is dynamic. We refuse to freeze a concept before it has found its true form.</p>
+            <div className="space-y-12 md:mt-48">
+               <div className="aspect-[3/4] overflow-hidden bg-gray-100 shadow-xl rounded-sm">
+                  <img src="https://picsum.photos/1000/1500?random=801" className="w-full h-full object-cover grayscale opacity-80" alt="Process detail" />
+               </div>
+               <div className="space-y-6">
+                 <h3 className="mono text-[11px] font-bold uppercase tracking-[0.4em] text-black/30">Step 02 — Calibration</h3>
+                 <p className="text-editorial text-xl text-gray-600 leading-relaxed font-light italic serif">
+                   The transition from draft to prototype is a dialogue. We calibrate the weight of the seam, the fall of the grain, and the intention of the hem.
+                 </p>
+               </div>
             </div>
           </div>
 
-          <p className="pt-12 text-center serif italic text-2xl text-gray-400">
-            "There is no rush to arrive. Only a commitment to stay honest."
-          </p>
+          <div className="py-24 border-y border-black/5 text-center space-y-12">
+             <h2 className="text-4xl md:text-6xl serif italic text-black/80">"Architecture for the body."</h2>
+             <p className="max-w-xl mx-auto text-gray-400 text-lg leading-relaxed italic serif">
+               We treat garment assembly like structural engineering. Every stitch is a load-bearing decision. We celebrate the inherent logic of the draft.
+             </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-16 pt-12">
+            {[1, 2, 3].map(i => (
+              <div key={i} className="space-y-6">
+                <div className="aspect-[4/5] overflow-hidden bg-gray-50 rounded-sm">
+                  <img src={`https://picsum.photos/800/1000?random=81${i}`} className="w-full h-full object-cover grayscale opacity-60 hover:opacity-100 transition-opacity duration-700" alt={`Method detail ${i}`} />
+                </div>
+                <h4 className="mono text-[10px] font-bold uppercase tracking-[0.3em] text-gray-300">Phase 0{i+2} Archive</h4>
+              </div>
+            ))}
+          </div>
         </section>
 
-        <section className="pt-24 border-t border-black/5 flex justify-between items-baseline">
-           <p className="text-[10px] uppercase tracking-widest text-gray-300">Methodology Review</p>
-           <div className="text-[10px] uppercase tracking-widest font-bold">
-             <span className="opacity-20">03</span> / 04
+        <section className="pt-24 border-t border-black/5 flex justify-between items-baseline reveal">
+           <p className="text-[11px] uppercase tracking-[0.5em] text-gray-300 font-bold">Berlin Studio Methodologies</p>
+           <div className="text-[12px] uppercase tracking-[0.6em] font-bold flex items-center gap-6">
+             <span className="opacity-10 hidden sm:inline">Section Index</span>
+             <span className="w-12 h-[1px] bg-black/10 hidden sm:inline"></span>
+             <span>03 / 04</span>
            </div>
         </section>
       </div>

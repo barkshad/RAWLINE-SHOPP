@@ -13,8 +13,9 @@ export interface Product {
   createdAt: number;
 }
 
-export interface SiteContent {
-  homePhilosophy: string;
-  aboutEssay: string;
-  founderStory: string;
+export interface Note {
+  id: string;
+  title: string;
+  date: string;
+  content: string;
 }
