@@ -70,6 +70,18 @@ const Header = () => {
     setMenuOpen(false);
   }, [pathname]);
 
+  // Lock body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [menuOpen]);
+
   const navLinks = [
     { name: 'Registry', path: '/archive' },
     { name: 'Philosophy', path: '/philosophy' },
@@ -79,17 +91,25 @@ const Header = () => {
 
   return (
     <>
+      {/* Backdrop Fade Effect */}
+      <div 
+        className={`fixed inset-0 z-[55] bg-[#1A1C1E]/40 backdrop-blur-[2px] transition-opacity duration-700 ease-in-out ${
+          menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+        }`}
+        onClick={() => setMenuOpen(false)}
+      />
+
       <header 
-        className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ease-in-out ${
+        className={`fixed top-0 left-0 w-full z-[100] transition-all duration-700 ease-in-out ${
           scrolled ? 'glass py-4 shadow-sm' : 'bg-transparent py-8 md:py-12'
         }`}
       >
         <div className="max-w-[1700px] mx-auto px-6 md:px-12 flex justify-between items-center">
-          <Link to="/" className="flex items-center gap-3 group relative z-[100]">
-            <div className="w-4 h-4 md:w-5 md:h-5 border border-black/20 flex items-center justify-center group-hover:bg-black transition-all duration-500">
-               <div className="w-1 h-1 bg-black group-hover:bg-white rounded-full"></div>
+          <Link to="/" className="flex items-center gap-3 group relative z-[110]">
+            <div className={`w-4 h-4 md:w-5 md:h-5 border border-black/20 flex items-center justify-center group-hover:bg-black transition-all duration-500 ${menuOpen ? 'border-black' : ''}`}>
+               <div className={`w-1 h-1 rounded-full transition-colors duration-500 ${menuOpen ? 'bg-black' : 'bg-black/40 group-hover:bg-white'}`}></div>
             </div>
-            <span className="mono text-[10px] md:text-[11px] font-bold tracking-[0.4em] uppercase">RAWLINE</span>
+            <span className={`mono text-[10px] md:text-[11px] font-bold tracking-[0.4em] uppercase transition-colors duration-500 ${menuOpen ? 'text-black' : 'text-current'}`}>RAWLINE</span>
           </Link>
 
           <nav className="hidden lg:flex items-center gap-12">
@@ -98,51 +118,68 @@ const Header = () => {
                 key={link.path} 
                 to={link.path}
                 className={`text-[10px] mono uppercase tracking-[0.2em] font-medium transition-all ${
-                  pathname === link.path ? 'text-black border-b border-black pb-1' : 'text-gray-400 hover:text-black'
+                  pathname === link.path ? 'text-[#1B3B5A] border-b-2 border-[#1B3B5A] pb-1' : 'text-[#1A1C1E]/40 hover:text-[#1B3B5A]'
                 }`}
               >
                 {link.name}
               </Link>
             ))}
             <div className="h-4 w-[1px] bg-black/10 mx-2"></div>
-            <Link to="/admin" className="text-[10px] mono uppercase tracking-[0.2em] font-bold text-[#2D3E50] hover:opacity-50 transition-opacity">
+            <Link to="/admin" className="text-[10px] mono uppercase tracking-[0.2em] font-bold text-[#1B3B5A] hover:text-[#B3704C] transition-colors">
               Internal
             </Link>
           </nav>
 
           <button 
-            className="lg:hidden p-2 relative z-[100]"
+            className="lg:hidden p-2 relative z-[110] transition-transform duration-300 hover:scale-110 active:scale-95"
             onClick={() => setMenuOpen(!menuOpen)}
             aria-label="Toggle Navigation"
           >
-            {menuOpen ? <X size={24} /> : <Menu size={24} />}
+            {menuOpen ? <X size={24} className="text-black" /> : <Menu size={24} />}
           </button>
         </div>
       </header>
 
       {/* Mobile Menu Overlay */}
-      <div className={`fixed inset-0 z-[60] bg-white transition-all duration-700 ease-in-out transform ${menuOpen ? 'translate-y-0' : '-translate-y-full'}`}>
-        <div className="p-8 md:p-16 h-full flex flex-col justify-between pt-40">
-          <nav className="flex flex-col gap-8">
-            <span className="mono text-[10px] font-bold text-gray-300 tracking-[0.5em] mb-4">STUDIO_NAV_INDEX</span>
-            {navLinks.map((link) => (
+      <div 
+        className={`fixed inset-0 z-[60] bg-[#F5F2EE] transition-transform duration-[800ms] [transition-timing-function:cubic-bezier(0.16,1,0.3,1)] transform ${
+          menuOpen ? 'translate-y-0' : '-translate-y-full'
+        }`}
+      >
+        <div className="p-8 md:p-16 h-full flex flex-col justify-between pt-40 md:pt-48">
+          <nav className="flex flex-col gap-6 md:gap-8">
+            <span className={`mono text-[10px] font-bold text-[#B3704C]/30 tracking-[0.5em] mb-4 transition-all duration-700 delay-100 ${menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>STUDIO_NAV_INDEX</span>
+            {navLinks.map((link, index) => (
               <Link 
                 key={link.path} 
                 to={link.path} 
-                className={`text-5xl md:text-7xl serif italic transition-all ${pathname === link.path ? 'text-black' : 'text-gray-300 hover:text-black'}`}
+                style={{ transitionDelay: `${200 + index * 100}ms` }}
+                className={`text-5xl md:text-8xl serif italic transition-all duration-700 ${
+                  menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+                } ${pathname === link.path ? 'text-[#1B3B5A]' : 'text-[#1A1C1E]/20 hover:text-[#B3704C]'}`}
               >
                 {link.name}
               </Link>
             ))}
           </nav>
-          <div className="pb-12 border-t pt-10 border-black/5 flex flex-col md:flex-row justify-between items-start md:items-end gap-10">
-            <Link to="/admin" className="text-sm mono uppercase tracking-widest text-[#2D3E50] font-bold">
-              Access Restricted Database
-            </Link>
-            <div className="flex gap-10 mono text-[10px] uppercase tracking-widest text-gray-400">
-                <span>Berlin, DE</span>
-                <span>EST 2024</span>
+          
+          <div 
+            className={`pb-12 border-t pt-10 border-[#1B3B5A]/5 flex flex-col md:flex-row justify-between items-start md:items-end gap-10 transition-all duration-700 delay-500 ${
+              menuOpen ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+            }`}
+          >
+            <div className="space-y-4">
+              <Link to="/admin" className="text-sm mono uppercase tracking-widest text-[#1B3B5A] font-bold hover:text-[#B3704C] transition-colors">
+                Access Restricted Database
+              </Link>
+              <div className="flex gap-10 mono text-[10px] uppercase tracking-widest text-[#1A1C1E]/30">
+                  <span>Berlin, DE</span>
+                  <span>EST 2024</span>
+              </div>
             </div>
+            <p className="max-w-xs text-[10px] mono uppercase tracking-widest leading-loose text-[#1A1C1E]/30 text-left md:text-right italic">
+              A registry of historical findings and curated silhouettes for the long line.
+            </p>
           </div>
         </div>
       </div>
@@ -170,17 +207,17 @@ const Footer = () => (
            <div className="space-y-8">
              <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Navigation</h4>
              <ul className="space-y-4 text-[11px] mono uppercase tracking-[0.2em] font-medium">
-               <li><Link to="/archive" className="hover:text-[#2D3E50] transition-colors">Archive</Link></li>
-               <li><Link to="/philosophy" className="hover:text-[#2D3E50] transition-colors">Manifesto</Link></li>
-               <li><Link to="/process" className="hover:text-[#2D3E50] transition-colors">Methods</Link></li>
-               <li><Link to="/notes" className="hover:text-[#2D3E50] transition-colors">Journal</Link></li>
+               <li><Link to="/archive" className="hover:text-[#1B3B5A] transition-colors">Archive</Link></li>
+               <li><Link to="/philosophy" className="hover:text-[#1B3B5A] transition-colors">Manifesto</Link></li>
+               <li><Link to="/process" className="hover:text-[#1B3B5A] transition-colors">Methods</Link></li>
+               <li><Link to="/notes" className="hover:text-[#1B3B5A] transition-colors">Journal</Link></li>
              </ul>
            </div>
            <div className="space-y-8">
              <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Connect</h4>
              <ul className="space-y-4 text-[11px] mono uppercase tracking-[0.2em] font-medium">
-               <li><a href="#" className="hover:text-[#2D3E50] flex items-center gap-2">Studio Dispatch <ArrowUpRight size={12} /></a></li>
-               <li><a href="#" className="hover:text-[#2D3E50] flex items-center gap-2">Coordinates <ArrowUpRight size={12} /></a></li>
+               <li><a href="#" className="hover:text-[#1B3B5A] flex items-center gap-2">Studio Dispatch <ArrowUpRight size={12} /></a></li>
+               <li><a href="#" className="hover:text-[#1B3B5A] flex items-center gap-2">Coordinates <ArrowUpRight size={12} /></a></li>
              </ul>
            </div>
            <div className="space-y-8">
@@ -199,7 +236,7 @@ const Footer = () => (
       <div className="mt-32 pt-12 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-8">
         <span className="mono text-[9px] uppercase tracking-[0.3em] text-gray-300">© 2024 RAWLINE STUDIO. ALL RECORDS DOCUMENTED.</span>
         <div className="flex flex-wrap justify-center items-center gap-8 mono text-[9px] uppercase tracking-[0.3em] text-gray-300">
-           <span className="text-[#2D3E50] font-bold">52.5200° N, 13.4050° E</span>
+           <span className="text-[#1B3B5A] font-bold">52.5200° N, 13.4050° E</span>
            <span className="hidden md:inline h-3 w-[1px] bg-black/10"></span>
            <span>Berlin Registry No. 00-24</span>
         </div>
@@ -213,7 +250,7 @@ const AppContent: React.FC<{ products: Product[]; addProduct: (p: Product) => vo
   useScrollReveal();
 
   return (
-    <div className="min-h-screen flex flex-col selection:bg-[#2D3E50] selection:text-white">
+    <div className="min-h-screen flex flex-col selection:bg-[#1B3B5A] selection:text-white">
       <ScrollToTop />
       <Header />
       <main className="flex-grow pt-24 md:pt-32">

@@ -18,6 +18,8 @@
             --raw-ochre: #B3704C;
             --raw-moss: #5D6D5E;
             --raw-parchment: #EBE6DF;
+            --glass-bg: rgba(255, 255, 255, 0.4);
+            --liquid-glow: rgba(27, 59, 90, 0.05);
         }
         
         body {
@@ -26,6 +28,7 @@
             color: var(--raw-ink);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+            background: radial-gradient(circle at 50% -20%, #EBE6DF, #F5F2EE 60%);
         }
 
         /* Massive Fluid Typography for Hero */
@@ -43,24 +46,42 @@
             letter-spacing: -0.015em;
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 5px; }
-        ::-webkit-scrollbar-track { background: var(--raw-parchment); }
-        ::-webkit-scrollbar-thumb { background: var(--raw-clay); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--raw-ochre); }
+        /* Liquid Scrollbar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { 
+            background: var(--raw-mineral); 
+            border-radius: 10px;
+            opacity: 0.5;
+        }
 
+        /* High Polish Glass */
         .glass {
-            background: rgba(245, 242, 238, 0.9);
+            background: rgba(245, 242, 238, 0.65);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .glass-dark {
+            background: rgba(27, 59, 90, 0.08);
             backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border-bottom: 1px solid rgba(27, 59, 90, 0.05);
+            border: 1px solid rgba(27, 59, 90, 0.1);
+        }
+
+        /* Liquid Distortion Filter */
+        .liquid-hover {
+            transition: filter 0.5s ease;
+        }
+        .liquid-hover:hover {
+            filter: url(#liquid);
         }
 
         /* Reveal System */
         .reveal {
             opacity: 0;
-            transform: translateY(40px);
-            transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            transform: translateY(30px);
+            transition: opacity 1.4s cubic-bezier(0.16, 1, 0.3, 1), transform 1.4s cubic-bezier(0.16, 1, 0.3, 1);
             will-change: opacity, transform;
         }
         .reveal.active {
@@ -68,24 +89,28 @@
             transform: translateY(0);
         }
 
-        /* Hero Specific Animations */
+        /* Floating Animation */
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+            100% { transform: translateY(0px); }
+        }
+        .animate-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        /* Title Reveal - Liquid Weighted */
         @keyframes titleReveal {
-            from { transform: translateY(100%); skewY(5deg); opacity: 0; }
-            to { transform: translateY(0) skewY(0); opacity: 1; }
+            from { transform: translateY(120%) skewY(10deg); opacity: 0; filter: blur(10px); }
+            to { transform: translateY(0) skewY(0); opacity: 1; filter: blur(0px); }
         }
 
         .animate-title-reveal {
             display: inline-block;
-            animation: titleReveal 1.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: titleReveal 2.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
-        /* Custom Selection */
-        ::selection {
-            background-color: var(--raw-mineral);
-            color: #ffffff;
-        }
-
-        /* Cursor - only on fine pointers (desktop) */
+        /* Cursor */
         @media (pointer: fine) {
             body { cursor: none; }
             #cursor {
@@ -96,27 +121,23 @@
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 10000;
-                transition: transform 0.1s ease;
+                mix-blend-mode: difference;
             }
             #cursor-follower {
                 position: fixed;
-                width: 32px;
-                height: 32px;
-                border: 1px solid rgba(179, 112, 76, 0.3);
+                width: 40px;
+                height: 40px;
+                background: rgba(179, 112, 76, 0.1);
+                border: 1px solid rgba(179, 112, 76, 0.2);
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 10000;
-                transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+                transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+                backdrop-filter: blur(2px);
             }
         }
-        @media (pointer: coarse) {
-            #cursor, #cursor-follower { display: none; }
-        }
 
-        .cursor-active #cursor { transform: scale(3); opacity: 0.3; }
-        .cursor-active #cursor-follower { transform: scale(1.4); border-color: var(--raw-mineral); }
-
-        /* Grainy Overlay */
+        /* Texture and Depth */
         body::after {
             content: "";
             position: fixed;
@@ -126,13 +147,9 @@
             height: 100vh;
             pointer-events: none;
             z-index: 9999;
-            opacity: 0.04;
+            opacity: 0.05;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
-        }
-
-        /* Subtle Section Gradients */
-        .bg-mineral-soft {
-            background: linear-gradient(135deg, #F5F2EE 0%, #EBE6DF 100%);
+            mix-blend-mode: overlay;
         }
     </style>
     <script type="importmap">
@@ -154,6 +171,17 @@
 <body>
     <div id="cursor"></div>
     <div id="cursor-follower"></div>
+    
+    <!-- SVG Liquid Distortion Filters -->
+    <svg style="position: absolute; width: 0; height: 0;" width="0" height="0" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+        <defs>
+            <filter id="liquid">
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" result="warp" />
+                <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="30" in="SourceGraphic" in2="warp" />
+            </filter>
+        </defs>
+    </svg>
+
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
@@ -161,23 +189,54 @@
         const follower = document.getElementById('cursor-follower');
         
         if (window.matchMedia("(pointer: fine)").matches) {
+            let mouseX = 0, mouseY = 0;
+            let cursorX = 0, cursorY = 0;
+            let followerX = 0, followerY = 0;
+
             document.addEventListener('mousemove', (e) => {
-                cursor.style.left = e.clientX + 'px';
-                cursor.style.top = e.clientY + 'px';
-                setTimeout(() => {
-                    follower.style.left = (e.clientX - 16) + 'px';
-                    follower.style.top = (e.clientY - 16) + 'px';
-                }, 60);
+                mouseX = e.clientX;
+                mouseY = e.clientY;
             });
 
-            document.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
-            document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+            const animate = () => {
+                cursorX += (mouseX - cursorX) * 0.2;
+                cursorY += (mouseY - cursorY) * 0.2;
+                followerX += (mouseX - followerX) * 0.1;
+                followerY += (mouseY - followerY) * 0.1;
+
+                cursor.style.left = cursorX + 'px';
+                cursor.style.top = cursorY + 'px';
+                follower.style.left = (followerX - 20) + 'px';
+                follower.style.top = (followerY - 20) + 'px';
+
+                requestAnimationFrame(animate);
+            };
+            animate();
+
+            document.addEventListener('mousedown', () => {
+                follower.style.transform = 'scale(0.8)';
+                cursor.style.transform = 'scale(2)';
+            });
+            document.addEventListener('mouseup', () => {
+                follower.style.transform = 'scale(1)';
+                cursor.style.transform = 'scale(1)';
+            });
         }
         
         const updateHoverState = () => {
             document.querySelectorAll('a, button, input, select, textarea').forEach(el => {
-                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-active'));
-                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-active'));
+                el.addEventListener('mouseenter', () => {
+                    follower.style.width = '60px';
+                    follower.style.height = '60px';
+                    follower.style.left = (mouseX - 30) + 'px';
+                    follower.style.top = (mouseY - 30) + 'px';
+                    follower.style.backgroundColor = 'rgba(27, 59, 90, 0.1)';
+                });
+                el.addEventListener('mouseleave', () => {
+                    follower.style.width = '40px';
+                    follower.style.height = '40px';
+                    follower.style.backgroundColor = 'rgba(179, 112, 76, 0.1)';
+                });
             });
         };
         const observer = new MutationObserver(updateHoverState);
