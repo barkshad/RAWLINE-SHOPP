@@ -20,6 +20,7 @@
             color: var(--raw-accent);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
+            cursor: none; /* Custom cursor implementation */
         }
         .serif {
             font-family: 'Playfair Display', serif;
@@ -35,31 +36,25 @@
 
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
-            width: 4px;
+            width: 3px;
         }
         ::-webkit-scrollbar-track {
             background: var(--raw-bg);
         }
         ::-webkit-scrollbar-thumb {
-            background: #d1d1d1;
-            border-radius: 10px;
+            background: #e5e5e5;
+            border-radius: 0px;
         }
         ::-webkit-scrollbar-thumb:hover {
             background: #1a1a1a;
         }
 
-        /* Glassmorphism Utility */
+        /* Glassmorphism Refinement */
         .glass {
-            background: rgba(250, 249, 246, 0.65);
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-        .glass-dark {
-            background: rgba(26, 26, 26, 0.8);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(250, 249, 246, 0.7);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
 
         /* Subtle Noise Texture Overlay */
@@ -72,30 +67,56 @@
             height: 100vh;
             pointer-events: none;
             z-index: 9999;
-            opacity: 0.03;
+            opacity: 0.04;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
         }
 
-        /* 3D Perspective for Tilt */
-        .perspective-1000 {
-            perspective: 1000px;
+        /* 3D Perspective */
+        .perspective-2000 {
+            perspective: 2000px;
         }
-        .preserve-3d {
-            transform-style: preserve-3d;
-        }
-
+        
         /* Animations */
         @keyframes reveal {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; transform: translateY(30px) skewY(1deg); }
+            to { opacity: 1; transform: translateY(0) skewY(0); }
         }
         .animate-reveal {
-            animation: reveal 1s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            animation: reveal 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
         .stagger-1 { animation-delay: 0.1s; }
         .stagger-2 { animation-delay: 0.2s; }
         .stagger-3 { animation-delay: 0.3s; }
         .stagger-4 { animation-delay: 0.4s; }
+
+        .vertical-text {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
+        }
+
+        /* Custom Cursor Styles */
+        #cursor {
+            position: fixed;
+            width: 10px;
+            height: 10px;
+            background: black;
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.15s ease-out, opacity 0.3s ease;
+        }
+        #cursor-follower {
+            position: fixed;
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(0,0,0,0.1);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 10000;
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .cursor-active #cursor { transform: scale(4); opacity: 0.15; }
+        .cursor-active #cursor-follower { transform: scale(1.5); border-color: rgba(0,0,0,0.5); }
     </style>
 <script type="importmap">
 {
@@ -113,7 +134,41 @@
 </script>
 </head>
 <body>
+    <div id="cursor"></div>
+    <div id="cursor-follower"></div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+    <script>
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        
+        document.addEventListener('mousemove', (e) => {
+            cursor.style.left = e.clientX + 'px';
+            cursor.style.top = e.clientY + 'px';
+            
+            // Lagging effect for follower
+            setTimeout(() => {
+                follower.style.left = (e.clientX - 15) + 'px';
+                follower.style.top = (e.clientY - 15) + 'px';
+            }, 50);
+        });
+
+        document.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
+        document.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
+        
+        // Add hover effect for interactive elements
+        const updateHoverState = () => {
+            const interactables = document.querySelectorAll('a, button, select, input');
+            interactables.forEach(el => {
+                el.addEventListener('mouseenter', () => document.body.classList.add('cursor-active'));
+                el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-active'));
+            });
+        };
+        
+        // Observer to handle dynamic content
+        const observer = new MutationObserver(updateHoverState);
+        observer.observe(document.body, { childList: true, subtree: true });
+        updateHoverState();
+    </script>
 </body>
 </html>

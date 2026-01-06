@@ -26,7 +26,7 @@ const Header = () => {
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 20);
+    const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
@@ -35,19 +35,22 @@ const Header = () => {
 
   return (
     <header 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ${
-        scrolled ? 'glass py-4 border-b border-black/5' : 'bg-transparent py-10'
+      className={`fixed top-0 left-0 w-full z-50 transition-all duration-1000 ease-in-out ${
+        scrolled ? 'glass py-5 border-b border-black/5 shadow-sm' : 'bg-transparent py-12'
       }`}
     >
-      <div className="max-w-[1600px] mx-auto px-6 md:px-12 flex justify-between items-center">
+      <div className="max-w-[1700px] mx-auto px-8 md:px-16 flex justify-between items-center">
         <Link 
           to="/" 
-          className="text-2xl font-light tracking-[0.4em] hover:opacity-50 transition-all duration-500 group flex items-center gap-3"
+          className="text-2xl font-light tracking-[0.5em] hover:opacity-50 transition-all duration-700 flex items-center gap-4 group"
         >
-          <span className="w-8 h-[1px] bg-black scale-x-0 group-hover:scale-x-100 transition-transform origin-left duration-500"></span>
+          <div className="w-6 h-6 border border-black/10 rounded-full flex items-center justify-center group-hover:border-black transition-colors duration-700">
+            <div className="w-1 h-1 bg-black rounded-full"></div>
+          </div>
           RAWLINE
         </Link>
-        <nav className="hidden lg:flex space-x-10 text-[10px] uppercase tracking-[0.3em] font-semibold">
+        
+        <nav className="hidden lg:flex space-x-12 text-[10px] uppercase tracking-[0.4em] font-bold">
           {[
             { name: 'Archive', path: '/archive' },
             { name: 'Philosophy', path: '/philosophy' },
@@ -58,22 +61,25 @@ const Header = () => {
             <Link 
               key={item.path}
               to={item.path} 
-              className={`relative py-1 transition-colors duration-500 ${
+              className={`relative py-1 overflow-hidden transition-all duration-700 ${
                 isActive(item.path) ? 'text-black' : 'text-gray-400 hover:text-black'
               }`}
             >
-              {item.name}
-              {isActive(item.path) && (
-                <span className="absolute bottom-0 left-0 w-full h-[1.5px] bg-black transition-all"></span>
-              )}
+              <span className="relative z-10">{item.name}</span>
+              <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-black transition-transform duration-700 origin-right ${
+                isActive(item.path) ? 'scale-x-100' : 'scale-x-0'
+              }`}></span>
             </Link>
           ))}
         </nav>
-        <div className="lg:hidden">
-          {/* Mobile menu trigger could go here, for now keeping it simple as per original */}
-          <Link to="/archive" className="text-[10px] uppercase tracking-widest font-bold border border-black/10 px-4 py-2 rounded-full glass">
-            Menu
-          </Link>
+
+        <div className="flex items-center gap-8">
+            <Link to="/admin" className="hidden lg:block text-[9px] uppercase tracking-[0.3em] font-bold text-gray-300 hover:text-black transition-colors italic">Registry Access</Link>
+            <div className="lg:hidden">
+              <Link to="/archive" className="text-[10px] uppercase tracking-widest font-bold border border-black/10 px-6 py-2 rounded-full glass hover:bg-black hover:text-white transition-all">
+                Registry
+              </Link>
+            </div>
         </div>
       </div>
     </header>
@@ -81,47 +87,62 @@ const Header = () => {
 };
 
 const Footer = () => (
-  <footer className="bg-white border-t border-black/5 pt-32 pb-16 mt-32 relative overflow-hidden">
-    <div className="absolute top-0 right-0 w-1/3 h-full bg-[#1A1A1A]/[0.02] -skew-x-12 translate-x-20"></div>
-    <div className="max-w-[1600px] mx-auto px-6 md:px-12 relative z-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-24 mb-32">
-        <div className="space-y-10">
-          <h4 className="text-[11px] uppercase tracking-[0.5em] font-bold opacity-30">Studio Identity</h4>
-          <p className="max-w-md text-lg text-editorial text-gray-400 leading-relaxed italic serif">
-            RAWLINE is an ongoing exploration of raw ideas and intentional creation. 
-            This project is not finished — and it doesn’t need to be.
-          </p>
-          <div className="pt-4 flex items-center gap-6">
-            <span className="w-12 h-[1px] bg-black/10"></span>
-            <span className="text-[10px] uppercase tracking-[0.3em] text-gray-300">Est. 2024</span>
+  <footer className="bg-white border-t border-black/5 pt-40 pb-20 relative overflow-hidden">
+    <div className="absolute top-0 left-0 w-full h-full opacity-[0.01] pointer-events-none flex items-center justify-center">
+        <span className="text-[40vw] font-bold serif italic leading-none">RAW</span>
+    </div>
+    <div className="max-w-[1700px] mx-auto px-8 md:px-16 relative z-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-32 mb-40">
+        <div className="space-y-12">
+          <div className="space-y-4">
+            <h4 className="text-[11px] uppercase tracking-[0.6em] font-bold text-gray-300">Origin Study</h4>
+            <p className="max-w-md text-2xl text-editorial text-gray-400 font-light leading-snug italic serif">
+              A continuous practice in structural clarity. We favor the silence of creation over the noise of the marketplace.
+            </p>
+          </div>
+          <div className="flex items-center gap-8">
+            <div className="w-16 h-[1px] bg-black/10"></div>
+            <span className="text-[9px] uppercase tracking-[0.4em] text-gray-300 font-bold">Studio Archive No. 00-24</span>
           </div>
         </div>
-        <div className="flex flex-col md:flex-row md:space-x-24 space-y-12 md:space-y-0">
+        
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-16">
           <div>
-            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-8 text-gray-300">Registry</h4>
-            <ul className="space-y-4 text-[11px] uppercase tracking-[0.2em] text-gray-500 font-medium">
-              <li><Link to="/archive" className="hover:text-black hover:translate-x-1 transition-all inline-block">Archive Index</Link></li>
-              <li><Link to="/philosophy" className="hover:text-black hover:translate-x-1 transition-all inline-block">The Manifesto</Link></li>
-              <li><Link to="/notes" className="hover:text-black hover:translate-x-1 transition-all inline-block">Journal Entries</Link></li>
-              <li><Link to="/admin" className="hover:text-black opacity-30 hover:opacity-100 transition-all inline-block italic">System Access</Link></li>
+            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Registry</h4>
+            <ul className="space-y-5 text-[10px] uppercase tracking-[0.3em] text-gray-500 font-bold">
+              <li><Link to="/archive" className="hover:text-black hover:pl-2 transition-all duration-500 block">Archive Index</Link></li>
+              <li><Link to="/philosophy" className="hover:text-black hover:pl-2 transition-all duration-500 block">Manifesto</Link></li>
+              <li><Link to="/notes" className="hover:text-black hover:pl-2 transition-all duration-500 block">Journal</Link></li>
             </ul>
           </div>
           <div>
-            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-8 text-gray-300">Connection</h4>
-            <ul className="space-y-4 text-[11px] uppercase tracking-[0.2em] text-gray-500 font-medium">
-              <li><a href="#" className="hover:text-black hover:translate-x-1 transition-all inline-block">Studio Dispatch</a></li>
-              <li><a href="#" className="hover:text-black hover:translate-x-1 transition-all inline-block">Digital Presence</a></li>
-              <li><a href="#" className="hover:text-black hover:translate-x-1 transition-all inline-block">Visual Archive</a></li>
+            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Interface</h4>
+            <ul className="space-y-5 text-[10px] uppercase tracking-[0.3em] text-gray-500 font-bold">
+              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Studio Dispatch</a></li>
+              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Visual Log</a></li>
+              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Coordinates</a></li>
             </ul>
+          </div>
+          <div className="col-span-2 lg:col-span-1">
+            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Engagement</h4>
+            <div className="space-y-6">
+                <input 
+                    type="email" 
+                    placeholder="Studio Dispatch" 
+                    className="w-full bg-transparent border-b border-black/10 py-3 text-[10px] uppercase tracking-widest outline-none focus:border-black transition-colors"
+                />
+                <p className="text-[9px] text-gray-400 leading-relaxed uppercase tracking-widest italic font-medium">Monthly updates from the cutting table.</p>
+            </div>
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row justify-between items-center pt-16 border-t border-black/5 text-[9px] uppercase tracking-[0.4em] text-gray-300 space-y-6 md:space-y-0">
+      
+      <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-black/5 text-[10px] uppercase tracking-[0.4em] text-gray-300 space-y-8 md:space-y-0 font-bold">
         <p>© RAWLINE — Founded on curiosity, not certainty.</p>
-        <div className="flex items-center gap-8">
-            <p className="italic serif">Process over Trend.</p>
-            <span className="w-1 h-1 bg-black/10 rounded-full"></span>
-            <p className="font-semibold tracking-[0.2em]">Designed in the Void</p>
+        <div className="flex items-center gap-10">
+            <p className="italic serif opacity-50">Documenting the process</p>
+            <div className="w-1.5 h-1.5 bg-black/10 rounded-full"></div>
+            <p>Berlin Studio</p>
         </div>
       </div>
     </div>
