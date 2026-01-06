@@ -6,6 +6,7 @@ import Shop from './pages/Shop';
 import ProductDetail from './pages/ProductDetail';
 import About from './pages/About';
 import Admin from './pages/Admin';
+import NotFound from './pages/NotFound';
 import Cart from './components/Cart';
 import { Product } from './types';
 import { INITIAL_PRODUCTS } from './constants';
@@ -147,6 +148,7 @@ const App: React.FC = () => {
             <Route path="/product/:id" element={<ProductDetail products={products} onAddToCart={addToCart} />} />
             <Route path="/about" element={<About />} />
             <Route path="/admin" element={<Admin products={products} onAdd={addProduct} />} />
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
         
