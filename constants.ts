@@ -2,11 +2,12 @@
 import { Product } from './types';
 
 export const COLORS = {
+  parchment: '#F5F2EE',
   clay: '#D4C7B0',
-  blueprint: '#2D3E50',
-  sage: '#8A9A8A',
-  stone: '#A8A8A8',
-  ink: '#1A1A1A'
+  mineral: '#1B3B5A',
+  moss: '#5D6D5E',
+  ochre: '#B3704C',
+  ink: '#1A1C1E'
 };
 
 export const INITIAL_PRODUCTS: Product[] = [
