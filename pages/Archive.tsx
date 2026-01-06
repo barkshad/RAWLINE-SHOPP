@@ -4,121 +4,120 @@ import { Link } from 'react-router-dom';
 import { Product } from '../types';
 import { CATEGORIES } from '../constants';
 import { TiltCard } from '../components/TiltCard';
+import { Search, SlidersHorizontal } from 'lucide-react';
 
 interface ArchiveProps {
   products: Product[];
 }
 
 const ProductCard: React.FC<{ product: Product, index: number }> = ({ product, index }) => (
-  <div className={`animate-reveal stagger-${(index % 4) + 1}`}>
-    <TiltCard className="h-full">
-      <Link to={`/product/${product.id}`} className="group block space-y-8 h-full bg-white/40 p-2 rounded-sm border border-black/[0.03] hover:border-black/10 hover:shadow-2xl transition-all duration-500">
-        <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden rounded-sm">
-          <img 
-            src={product.images[0]} 
-            alt={product.name} 
-            className="w-full h-full object-cover transition-all duration-1000 group-hover:scale-110 opacity-80 group-hover:opacity-100 grayscale group-hover:grayscale-0"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500"></div>
-          <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-500 translate-y-4 group-hover:translate-y-0">
-            <div className="glass px-6 py-3 rounded-full shadow-xl">
-               <p className="text-[10px] uppercase tracking-[0.3em] font-bold text-black">Examine Study</p>
-            </div>
-          </div>
-          <div className="absolute top-4 left-4">
-             <span className="text-[8px] uppercase tracking-[0.2em] font-bold text-white/50 group-hover:text-white transition-colors">Ref {product.id.padStart(3, '0')}</span>
-          </div>
+  <div className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
+    <Link to={`/product/${product.id}`} className="group block space-y-6">
+      <div className="aspect-[3/4] overflow-hidden bg-gray-50 rounded-sm relative border border-black/5">
+        <img 
+          src={product.images[0]} 
+          alt={product.name} 
+          className="w-full h-full object-cover grayscale opacity-80 group-hover:opacity-100 group-hover:scale-105 transition-all duration-700"
+        />
+        <div className="absolute top-4 left-4 mono text-[8px] font-bold tracking-widest bg-white/90 px-2 py-1 border border-black/10">
+          {product.id}
         </div>
-        <div className="flex flex-col space-y-3 px-2 pb-4">
-          <div className="flex justify-between items-baseline">
-            <h3 className="text-[14px] uppercase tracking-[0.2em] font-semibold text-black/80 group-hover:text-black transition-colors">{product.name}</h3>
-          </div>
-          <p className="text-[11px] text-gray-400 italic serif">{product.category}</p>
-          <p className="text-[12px] text-gray-400 leading-relaxed line-clamp-2 font-light max-w-[280px]">
-            {product.description}
-          </p>
-          <div className="pt-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-500">
-             <div className="w-6 h-[1px] bg-black"></div>
-             <span className="text-[9px] uppercase tracking-[0.2em] font-bold">Documented Study</span>
-          </div>
+        <div className="absolute bottom-0 left-0 w-full h-1/3 bg-gradient-to-t from-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+      </div>
+      <div className="space-y-2">
+        <div className="flex justify-between items-baseline">
+          <h3 className="text-[13px] font-bold uppercase tracking-tight text-gray-800">{product.name}</h3>
+          <span className="mono text-[10px] text-gray-400">€{product.price}</span>
         </div>
-      </Link>
-    </TiltCard>
+        <p className="text-[11px] text-[#8A9A8A] mono uppercase tracking-widest">{product.category}</p>
+        <p className="text-[12px] text-gray-400 font-light leading-relaxed line-clamp-2 italic serif">
+          {product.description}
+        </p>
+      </div>
+    </Link>
   </div>
 );
 
 const Archive: React.FC<ArchiveProps> = ({ products }) => {
   const [activeCategory, setActiveCategory] = useState('All');
+  const [search, setSearch] = useState('');
 
   const filteredProducts = useMemo(() => {
-    return activeCategory === 'All' 
-      ? [...products] 
-      : products.filter(p => p.category === activeCategory);
-  }, [products, activeCategory]);
+    return products.filter(p => {
+      const matchesCat = activeCategory === 'All' || p.category === activeCategory;
+      const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) || p.description.toLowerCase().includes(search.toLowerCase());
+      return matchesCat && matchesSearch;
+    });
+  }, [products, activeCategory, search]);
 
   return (
-    <div className="max-w-[1600px] mx-auto px-6 md:px-12 pt-32 pb-24">
-      <div className="mb-32 space-y-16">
-        <div className="flex flex-col lg:flex-row lg:items-end justify-between border-b border-black/5 pb-16 animate-reveal">
+    <div className="max-w-[1700px] mx-auto px-6 md:px-12 py-20">
+      <div className="mb-24 space-y-16">
+        {/* Header */}
+        <div className="flex flex-col lg:flex-row justify-between items-start lg:items-end gap-10">
           <div className="space-y-6">
-            <h2 className="text-[11px] uppercase tracking-[0.6em] font-bold text-gray-300 stagger-1">Repository Index</h2>
-            <h1 className="text-6xl md:text-8xl font-light tracking-tighter serif italic stagger-2">Archive Registry</h1>
-            <p className="text-sm uppercase tracking-[0.4em] text-gray-400 font-medium max-w-md leading-loose stagger-3">
-              A curated digital record of structural explorations and garment prototypes.
+            <div className="flex items-center gap-3 mono text-[10px] font-bold text-[#2D3E50] uppercase tracking-[0.4em]">
+               <div className="w-1.5 h-1.5 bg-[#2D3E50] rounded-full"></div>
+               REGISTRY_DB_ALPHA
+            </div>
+            <h1 className="text-6xl md:text-8xl font-light tracking-tighter serif italic text-black/90">Archive Records</h1>
+            <p className="max-w-md text-gray-400 font-light text-lg italic serif leading-relaxed">
+              A curated digital record of structural explorations and garment prototypes cataloged at RAWLINE Berlin.
             </p>
           </div>
           
-          <div className="flex flex-wrap gap-10 mt-16 lg:mt-0 items-center animate-reveal stagger-4">
-            <nav className="flex items-center glass px-8 py-4 rounded-full shadow-sm">
-              <span className="text-[9px] uppercase tracking-widest font-bold text-gray-300 mr-8">Classify</span>
-              <div className="flex gap-8">
-                {CATEGORIES.map(cat => (
-                    <button 
-                    key={cat}
-                    onClick={() => setActiveCategory(cat)}
-                    className={`text-[10px] uppercase tracking-[0.3em] font-bold transition-all duration-500 relative py-1 ${
-                        activeCategory === cat ? 'text-black' : 'text-gray-300 hover:text-black'
-                    }`}
-                    >
-                    {cat}
-                    {activeCategory === cat && (
-                        <span className="absolute -bottom-1 left-0 w-full h-[1px] bg-black animate-in fade-in zoom-in duration-500"></span>
-                    )}
-                    </button>
-                ))}
-              </div>
-            </nav>
+          <div className="w-full lg:w-auto flex flex-col md:flex-row items-center gap-6">
+            <div className="relative w-full md:w-64">
+              <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+              <input 
+                type="text" 
+                placeholder="Search Database"
+                className="w-full bg-white border border-black/5 py-3 pl-10 pr-4 rounded-sm mono text-[10px] uppercase tracking-widest outline-none focus:border-black transition-colors"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+              />
+            </div>
+            
+            <div className="flex items-center glass p-1 rounded-sm border border-black/5">
+               {CATEGORIES.map(cat => (
+                 <button 
+                   key={cat}
+                   onClick={() => setActiveCategory(cat)}
+                   className={`px-5 py-2 mono text-[9px] font-bold uppercase tracking-widest rounded-sm transition-all ${
+                     activeCategory === cat ? 'bg-black text-white' : 'text-gray-400 hover:text-black'
+                   }`}
+                 >
+                   {cat}
+                 </button>
+               ))}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-24">
+      {/* Grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-12 gap-y-20">
         {filteredProducts.map((product, i) => (
           <ProductCard key={product.id} product={product} index={i} />
         ))}
       </div>
 
       {filteredProducts.length === 0 && (
-        <div className="py-64 text-center animate-reveal">
-          <p className="serif italic text-4xl text-gray-200 mb-8 leading-tight">"Sometimes silence is the most resolved choice."</p>
+        <div className="py-40 text-center space-y-8 animate-fade-in">
+          <p className="text-3xl md:text-5xl font-light serif italic text-gray-200">The query returned no results.</p>
           <button 
-            onClick={() => setActiveCategory('All')}
-            className="text-[11px] uppercase tracking-[0.4em] font-bold glass px-10 py-4 rounded-full hover:bg-black hover:text-white transition-all duration-500"
+            onClick={() => { setActiveCategory('All'); setSearch(''); }}
+            className="mono text-[10px] font-bold uppercase tracking-widest border-b border-black pb-1 hover:opacity-50"
           >
-            Reset Registry View
+            Reset Filters
           </button>
         </div>
       )}
 
-      <div className="mt-64 text-center max-w-2xl mx-auto space-y-12 animate-reveal">
-        <div className="flex justify-center items-center gap-10">
-            <div className="w-16 h-px bg-black/10"></div>
-            <p className="text-[10px] uppercase tracking-[0.5em] text-gray-300 font-bold">End of Current Registry</p>
-            <div className="w-16 h-px bg-black/10"></div>
-        </div>
-        <p className="text-lg text-editorial text-gray-400 italic serif leading-relaxed">
-          The archive is not a catalog of sales. It is a registry of meaning. Every study included has been vetted for structural clarity and intentionality.
-        </p>
+      {/* Footer Stat */}
+      <div className="mt-40 pt-16 border-t border-black/5 flex justify-between items-center mono text-[10px] text-gray-300 font-bold tracking-widest">
+         <span>DISPLAYING {filteredProducts.length} RECORDS</span>
+         <span className="italic">END_OF_INDEX</span>
       </div>
     </div>
   );

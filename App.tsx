@@ -12,6 +12,7 @@ import Admin from './pages/Admin';
 import NotFound from './pages/NotFound';
 import { Product } from './types';
 import { INITIAL_PRODUCTS } from './constants';
+import { Menu, X, ArrowUpRight } from 'lucide-react';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -23,126 +24,149 @@ const ScrollToTop = () => {
 
 const Header = () => {
   const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const { pathname } = useLocation();
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
+    const handleScroll = () => setScrolled(window.scrollY > 40);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const isActive = (path: string) => pathname === path;
+  const navLinks = [
+    { name: 'Registry', path: '/archive' },
+    { name: 'Philosophy', path: '/philosophy' },
+    { name: 'Process', path: '/process' },
+    { name: 'Journal', path: '/notes' },
+  ];
 
   return (
-    <header 
-      className={`fixed top-0 left-0 w-full z-50 transition-all duration-1000 ease-in-out ${
-        scrolled ? 'glass py-5 border-b border-black/5 shadow-sm' : 'bg-transparent py-12'
-      }`}
-    >
-      <div className="max-w-[1700px] mx-auto px-8 md:px-16 flex justify-between items-center">
-        <Link 
-          to="/" 
-          className="text-2xl font-light tracking-[0.5em] hover:opacity-50 transition-all duration-700 flex items-center gap-4 group"
-        >
-          <div className="w-6 h-6 border border-black/10 rounded-full flex items-center justify-center group-hover:border-black transition-colors duration-700">
-            <div className="w-1 h-1 bg-black rounded-full"></div>
-          </div>
-          RAWLINE
-        </Link>
-        
-        <nav className="hidden lg:flex space-x-12 text-[10px] uppercase tracking-[0.4em] font-bold">
-          {[
-            { name: 'Archive', path: '/archive' },
-            { name: 'Philosophy', path: '/philosophy' },
-            { name: 'Process', path: '/process' },
-            { name: 'Founder', path: '/founder' },
-            { name: 'Notes', path: '/notes' },
-          ].map((item) => (
-            <Link 
-              key={item.path}
-              to={item.path} 
-              className={`relative py-1 overflow-hidden transition-all duration-700 ${
-                isActive(item.path) ? 'text-black' : 'text-gray-400 hover:text-black'
-              }`}
-            >
-              <span className="relative z-10">{item.name}</span>
-              <span className={`absolute bottom-0 left-0 w-full h-[1px] bg-black transition-transform duration-700 origin-right ${
-                isActive(item.path) ? 'scale-x-100' : 'scale-x-0'
-              }`}></span>
-            </Link>
-          ))}
-        </nav>
-
-        <div className="flex items-center gap-8">
-            <Link to="/admin" className="hidden lg:block text-[9px] uppercase tracking-[0.3em] font-bold text-gray-300 hover:text-black transition-colors italic">Registry Access</Link>
-            <div className="lg:hidden">
-              <Link to="/archive" className="text-[10px] uppercase tracking-widest font-bold border border-black/10 px-6 py-2 rounded-full glass hover:bg-black hover:text-white transition-all">
-                Registry
-              </Link>
+    <>
+      <header 
+        className={`fixed top-0 left-0 w-full z-50 transition-all duration-700 ease-in-out ${
+          scrolled ? 'glass py-4' : 'bg-transparent py-10'
+        }`}
+      >
+        <div className="max-w-[1700px] mx-auto px-6 md:px-12 flex justify-between items-center">
+          <Link to="/" className="flex items-center gap-3 group">
+            <div className="w-5 h-5 border border-black/20 flex items-center justify-center group-hover:bg-black transition-all duration-500">
+               <div className="w-1 h-1 bg-black group-hover:bg-white rounded-full"></div>
             </div>
+            <span className="mono text-[11px] font-bold tracking-[0.4em] uppercase">RAWLINE</span>
+          </Link>
+
+          <nav className="hidden lg:flex items-center gap-10">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.path} 
+                to={link.path}
+                className={`text-[10px] mono uppercase tracking-[0.2em] font-medium transition-colors ${
+                  pathname === link.path ? 'text-black' : 'text-gray-400 hover:text-black'
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            <div className="h-4 w-[1px] bg-black/10 mx-2"></div>
+            <Link to="/admin" className="text-[10px] mono uppercase tracking-[0.2em] font-bold text-[#2D3E50] hover:underline underline-offset-4">
+              Internal Registry
+            </Link>
+          </nav>
+
+          <button 
+            className="lg:hidden p-2"
+            onClick={() => setMenuOpen(!menuOpen)}
+          >
+            {menuOpen ? <X size={20} /> : <Menu size={20} />}
+          </button>
+        </div>
+      </header>
+
+      {/* Mobile Menu */}
+      <div className={`fixed inset-0 z-[60] bg-white transition-transform duration-700 ease-in-out ${menuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+        <div className="p-8 h-full flex flex-col justify-between">
+          <div className="flex justify-between items-center">
+            <span className="mono text-xs font-bold tracking-[0.3em]">NAV_INDEX</span>
+            <button onClick={() => setMenuOpen(false)}><X size={24} /></button>
+          </div>
+          <nav className="flex flex-col gap-10">
+            {navLinks.map((link) => (
+              <Link 
+                key={link.path} 
+                to={link.path} 
+                onClick={() => setMenuOpen(false)}
+                className="text-4xl serif italic hover:pl-4 transition-all duration-500"
+              >
+                {link.name}
+              </Link>
+            ))}
+          </nav>
+          <div className="pb-10 border-t pt-10 border-black/5">
+            <Link 
+              to="/admin" 
+              onClick={() => setMenuOpen(false)}
+              className="text-sm mono uppercase tracking-widest text-[#2D3E50]"
+            >
+              Registry Access Restricted
+            </Link>
+          </div>
         </div>
       </div>
-    </header>
+    </>
   );
 };
 
 const Footer = () => (
-  <footer className="bg-white border-t border-black/5 pt-40 pb-20 relative overflow-hidden">
-    <div className="absolute top-0 left-0 w-full h-full opacity-[0.01] pointer-events-none flex items-center justify-center">
-        <span className="text-[40vw] font-bold serif italic leading-none">RAW</span>
-    </div>
-    <div className="max-w-[1700px] mx-auto px-8 md:px-16 relative z-10">
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-32 mb-40">
-        <div className="space-y-12">
-          <div className="space-y-4">
-            <h4 className="text-[11px] uppercase tracking-[0.6em] font-bold text-gray-300">Origin Study</h4>
-            <p className="max-w-md text-2xl text-editorial text-gray-400 font-light leading-snug italic serif">
-              A continuous practice in structural clarity. We favor the silence of creation over the noise of the marketplace.
-            </p>
-          </div>
-          <div className="flex items-center gap-8">
-            <div className="w-16 h-[1px] bg-black/10"></div>
-            <span className="text-[9px] uppercase tracking-[0.4em] text-gray-300 font-bold">Studio Archive No. 00-24</span>
-          </div>
+  <footer className="bg-white border-t border-black/5 py-24">
+    <div className="max-w-[1700px] mx-auto px-6 md:px-12">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-20">
+        <div className="lg:col-span-5 space-y-8">
+           <Link to="/" className="flex items-center gap-3">
+              <div className="w-6 h-6 border border-black/10 flex items-center justify-center">
+                <div className="w-1 h-1 bg-black rounded-full"></div>
+              </div>
+              <span className="mono text-xs font-bold tracking-[0.5em]">RAWLINE</span>
+           </Link>
+           <p className="max-w-md text-xl text-editorial text-gray-400 font-light italic serif">
+             A continuous study in structural clarity. We reject the seasonal cycle in favor of the resolved form.
+           </p>
         </div>
         
-        <div className="grid grid-cols-2 lg:grid-cols-3 gap-16">
-          <div>
-            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Registry</h4>
-            <ul className="space-y-5 text-[10px] uppercase tracking-[0.3em] text-gray-500 font-bold">
-              <li><Link to="/archive" className="hover:text-black hover:pl-2 transition-all duration-500 block">Archive Index</Link></li>
-              <li><Link to="/philosophy" className="hover:text-black hover:pl-2 transition-all duration-500 block">Manifesto</Link></li>
-              <li><Link to="/notes" className="hover:text-black hover:pl-2 transition-all duration-500 block">Journal</Link></li>
-            </ul>
-          </div>
-          <div>
-            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Interface</h4>
-            <ul className="space-y-5 text-[10px] uppercase tracking-[0.3em] text-gray-500 font-bold">
-              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Studio Dispatch</a></li>
-              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Visual Log</a></li>
-              <li><a href="#" className="hover:text-black hover:pl-2 transition-all duration-500 block">Coordinates</a></li>
-            </ul>
-          </div>
-          <div className="col-span-2 lg:col-span-1">
-            <h4 className="text-[11px] uppercase tracking-widest font-bold mb-10 text-gray-300">Engagement</h4>
-            <div className="space-y-6">
+        <div className="lg:col-span-7 grid grid-cols-2 md:grid-cols-3 gap-10">
+           <div className="space-y-6">
+             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Navigation</h4>
+             <ul className="space-y-3 text-[11px] mono uppercase tracking-widest font-medium">
+               <li><Link to="/archive" className="hover:text-[#2D3E50] transition-colors">Archive</Link></li>
+               <li><Link to="/philosophy" className="hover:text-[#2D3E50] transition-colors">Manifesto</Link></li>
+               <li><Link to="/process" className="hover:text-[#2D3E50] transition-colors">Methods</Link></li>
+             </ul>
+           </div>
+           <div className="space-y-6">
+             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Connect</h4>
+             <ul className="space-y-3 text-[11px] mono uppercase tracking-widest font-medium">
+               <li><a href="#" className="hover:text-[#2D3E50] transition-colors flex items-center gap-2">Studio Dispatch <ArrowUpRight size={12} /></a></li>
+               <li><a href="#" className="hover:text-[#2D3E50] transition-colors flex items-center gap-2">Coordinates <ArrowUpRight size={12} /></a></li>
+             </ul>
+           </div>
+           <div className="col-span-2 md:col-span-1 space-y-6">
+             <h4 className="mono text-[10px] font-bold text-gray-300 uppercase tracking-widest">Dispatch</h4>
+             <div className="relative">
                 <input 
-                    type="email" 
-                    placeholder="Studio Dispatch" 
-                    className="w-full bg-transparent border-b border-black/10 py-3 text-[10px] uppercase tracking-widest outline-none focus:border-black transition-colors"
+                  type="email" 
+                  placeholder="Enter Email" 
+                  className="w-full bg-transparent border-b border-black/10 py-2 mono text-[10px] uppercase tracking-widest outline-none focus:border-black transition-colors"
                 />
-                <p className="text-[9px] text-gray-400 leading-relaxed uppercase tracking-widest italic font-medium">Monthly updates from the cutting table.</p>
-            </div>
-          </div>
+             </div>
+           </div>
         </div>
       </div>
       
-      <div className="flex flex-col md:flex-row justify-between items-center pt-20 border-t border-black/5 text-[10px] uppercase tracking-[0.4em] text-gray-300 space-y-8 md:space-y-0 font-bold">
-        <p>© RAWLINE — Founded on curiosity, not certainty.</p>
-        <div className="flex items-center gap-10">
-            <p className="italic serif opacity-50">Documenting the process</p>
-            <div className="w-1.5 h-1.5 bg-black/10 rounded-full"></div>
-            <p>Berlin Studio</p>
+      <div className="mt-24 pt-10 border-t border-black/5 flex flex-col md:flex-row justify-between items-center gap-6">
+        <span className="mono text-[9px] uppercase tracking-widest text-gray-300">© 2024 RAWLINE STUDIO. ALL RIGHTS RESERVED.</span>
+        <div className="flex items-center gap-6 mono text-[9px] uppercase tracking-widest text-gray-300">
+           <span className="text-[#2D3E50] font-bold">52.5200° N, 13.4050° E</span>
+           <span className="h-3 w-[1px] bg-black/10"></span>
+           <span>Berlin Archive No. 00-24</span>
         </div>
       </div>
     </div>
@@ -151,22 +175,22 @@ const Footer = () => (
 
 const App: React.FC = () => {
   const [products, setProducts] = useState<Product[]>(() => {
-    const saved = localStorage.getItem('rawline_products');
+    const saved = localStorage.getItem('rawline_products_v2');
     return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
   });
 
   const addProduct = (product: Product) => {
     const updated = [product, ...products];
     setProducts(updated);
-    localStorage.setItem('rawline_products', JSON.stringify(updated));
+    localStorage.setItem('rawline_products_v2', JSON.stringify(updated));
   };
 
   return (
     <Router>
       <ScrollToTop />
-      <div className="min-h-screen flex flex-col selection:bg-black selection:text-white">
+      <div className="min-h-screen flex flex-col selection:bg-[#2D3E50] selection:text-white">
         <Header />
-        <main className="flex-grow">
+        <main className="flex-grow pt-20">
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/archive" element={<Archive products={products} />} />

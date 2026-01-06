@@ -1,5 +1,7 @@
 {
-  "name": "RAWLINE — Process Over Trend",
-  "description": "An architectural exploration of garment construction and intentional creation. RAWLINE is a digital archive focusing on raw ideas, first drafts, and meaning over output.",
-  "requestFramePermissions": []
+  "name": "RAWLINE — Structural Archive",
+  "description": "A professional digital registry for architectural garment construction and intentional design logic. RAWLINE prioritizes the honesty of the draft over the noise of the market.",
+  "requestFramePermissions": [
+    "camera"
+  ]
 }
