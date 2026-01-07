@@ -1,6 +1,6 @@
 {
   "name": "RAWLINE Maison d'Archive — Nairobi",
-  "description": "An advanced fashion CMS and high-luxury editorial platform for a Nairobi-based vintage restoration house.",
+  "description": "An advanced fashion editorial platform integrated with Firebase Firestore and Cloudinary for archival documentation.",
   "requestFramePermissions": [
     "camera"
   ]

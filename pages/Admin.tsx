@@ -3,10 +3,13 @@ import React, { useState } from 'react';
 import { Product, SiteContent } from '../types';
 import { CATEGORIES } from '../constants';
 import { generateEditorialThesis } from '../services/geminiService';
+import { uploadToCloudinary, getCloudinaryUrl } from '../services/cloudinary';
+import { saveProduct, removeProduct } from '../services/contentService';
 import { 
   Database, Cpu, Plus, FileText, Settings, BookOpen, 
   Layers, Edit3, Trash2, MoveRight, ShieldCheck, 
-  Activity, Globe, Terminal, RefreshCw, Save, LogOut
+  Activity, Globe, Terminal, RefreshCw, Save, LogOut,
+  Image as ImageIcon, Upload, Loader2, CheckCircle2
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -19,6 +22,72 @@ interface AdminProps {
 }
 
 type Tab = 'Identity' | 'Registry' | 'Philosophy' | 'Methodology' | 'Journal';
+
+const FileUpload: React.FC<{ 
+  onUpload: (publicId: string) => void;
+  currentPublicId?: string;
+  label: string;
+}> = ({ onUpload, currentPublicId, label }) => {
+  const [isUploading, setIsUploading] = useState(false);
+
+  const handleChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+    try {
+      const publicId = await uploadToCloudinary(file);
+      onUpload(publicId);
+    } catch (err) {
+      console.error(err);
+      alert("Media Synchronize Failed.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">{label}</label>
+      <div className="relative group">
+        <input 
+          type="file" 
+          accept="image/*" 
+          onChange={handleChange}
+          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+          disabled={isUploading}
+        />
+        <div className={`w-full h-40 border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all ${
+          isUploading ? 'border-[#8E4E35] bg-[#8E4E35]/5' : 'border-white/10 bg-white/5 hover:border-white/30'
+        }`}>
+          {isUploading ? (
+            <>
+              <Loader2 className="animate-spin text-[#8E4E35]" />
+              <span className="text-[8px] mono uppercase tracking-widest">Uploading...</span>
+            </>
+          ) : currentPublicId ? (
+            <div className="w-full h-full relative">
+              <img 
+                src={getCloudinaryUrl(currentPublicId, "w_400,c_fill")} 
+                className="w-full h-full object-cover opacity-60" 
+                alt="Preview"
+              />
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity">
+                <Upload size={20} className="text-white mb-2" />
+                <span className="text-[8px] mono uppercase text-white tracking-[0.2em]">Replace_Asset</span>
+              </div>
+            </div>
+          ) : (
+            <>
+              <ImageIcon size={24} className="text-white/20" />
+              <span className="text-[8px] mono uppercase tracking-[0.2em] text-white/40">Select_Archival_Plate</span>
+            </>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, onUpdateContent, onLogout }) => {
   const [activeTab, setActiveTab] = useState<Tab>('Identity');
@@ -56,28 +125,51 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
     editorial: '',
     fabric: '',
     fit: '',
-    images: ['https://picsum.photos/1000/1500?random=' + Math.floor(Math.random() * 1000)],
+    images: [],
   });
 
-  const handleAddProduct = () => {
+  const handleAddProduct = async () => {
+    if (!newProduct.name || !newProduct.images?.length) {
+      alert("Designation and at least one image plate required.");
+      return;
+    }
+    
+    setSaveStatus('SAVING');
     const p: Product = {
       ...newProduct as Product,
-      id: `REF-${(products.length + 1).toString().padStart(3, '0')}`,
+      id: `REF-${Date.now().toString().slice(-6)}`,
       status: 'published',
       createdAt: Date.now(),
     };
-    onUpdateProducts([p, ...products]);
-    setNewProduct({
-      name: '', category: 'Tops', price: 0, description: '', editorial: '', fabric: '', fit: '',
-      images: ['https://picsum.photos/1000/1500?random=' + Math.floor(Math.random() * 1000)],
-    });
-    handleSaveAnimation();
+
+    try {
+      await saveProduct(p);
+      onUpdateProducts([p, ...products]);
+      setNewProduct({
+        name: '', category: 'Tops', price: 0, description: '', editorial: '', fabric: '', fit: '',
+        images: [],
+      });
+      setSaveStatus('SAVED');
+      setTimeout(() => setSaveStatus('IDLE'), 2000);
+    } catch (err) {
+      console.error(err);
+      alert("Registry Commitment Failed.");
+      setSaveStatus('IDLE');
+    }
   };
 
-  const handleDeleteProduct = (id: string) => {
+  const handleDeleteProduct = async (id: string) => {
     if (window.confirm("Permanent registry retraction requested. Proceed?")) {
-      onUpdateProducts(products.filter(p => p.id !== id));
-      handleSaveAnimation();
+      setSaveStatus('SAVING');
+      try {
+        await removeProduct(id);
+        onUpdateProducts(products.filter(p => p.id !== id));
+        setSaveStatus('SAVED');
+        setTimeout(() => setSaveStatus('IDLE'), 2000);
+      } catch (err) {
+        console.error(err);
+        setSaveStatus('IDLE');
+      }
     }
   };
 
@@ -92,13 +184,8 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
   };
 
   const addProcessStep = () => {
-    const newSteps = [...siteContent.process.steps, { id: Date.now().toString(), title: 'New Step', description: 'Step description...', image: 'https://picsum.photos/1000/1500?random=' + Math.floor(Math.random() * 1000) }];
+    const newSteps = [...siteContent.process.steps, { id: Date.now().toString(), title: 'New Step', description: 'Step description...', image: '' }];
     onUpdateContent({ ...siteContent, process: { ...siteContent.process, steps: newSteps } });
-    handleSaveAnimation();
-  };
-
-  const deleteProcessStep = (id: string) => {
-    onUpdateContent({ ...siteContent, process: { ...siteContent.process, steps: siteContent.process.steps.filter(s => s.id !== id) } });
     handleSaveAnimation();
   };
 
@@ -108,208 +195,188 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
     handleSaveAnimation();
   };
 
-  const deleteJournalEntry = (id: string) => {
-    onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, entries: siteContent.notes.entries.filter(e => e.id !== id) } });
-    handleSaveAnimation();
-  };
-
   return (
-    <div className="min-h-screen bg-[#121212] text-[#F2EDE4] pt-48 pb-32 font-mono selection:bg-[#8E4E35]">
-      <div className="max-w-[1700px] mx-auto px-8 md:px-16">
+    <div className="min-h-screen bg-[#121212] text-[#F2EDE4] pt-32 md:pt-48 pb-20 md:pb-32 font-mono selection:bg-[#8E4E35]">
+      <div className="max-w-[1700px] mx-auto px-6 md:px-12 xl:px-16">
         
         {/* Top Status Bar */}
-        <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-20 border border-white/5 p-6 bg-black/40 backdrop-blur-xl">
-           <div className="flex items-center gap-10">
+        <div className="flex flex-col lg:flex-row justify-between items-center gap-6 mb-12 md:mb-20 border border-white/5 p-4 md:p-6 bg-black/40 backdrop-blur-xl rounded-sm">
+           <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 md:gap-10">
               <div className="flex items-center gap-3 px-4 py-2 bg-[#8E4E35]/10 border border-[#8E4E35]/30 rounded-full">
-                 <Terminal size={14} className="text-[#8E4E35]" />
-                 <span className="text-[10px] font-black uppercase tracking-[0.2em]">OPERATIONAL_UNIT_01</span>
+                 <Terminal size={12} className="text-[#8E4E35] md:w-3.5 md:h-3.5" />
+                 <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.2em]">UNIT_01_TERMINAL</span>
               </div>
-              <div className="h-4 w-[1px] bg-white/10 hidden md:block"></div>
-              <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase">
+              <div className="hidden sm:flex items-center gap-2 text-green-500 text-[9px] md:text-[10px] font-black uppercase">
                  <Activity size={12} />
                  SYSTEM_STABLE
               </div>
            </div>
            
-           <div className="flex items-center gap-8">
-              <div className="text-[10px] text-white/20 uppercase tracking-[0.4em]">
-                 LOCAL_STORAGE_SYNC: ACTIVE
+           <div className="flex flex-wrap items-center justify-center gap-6 md:gap-8">
+              <div className="hidden xl:block text-[9px] text-white/20 uppercase tracking-[0.4em]">
+                 FIRESTORE_SYNC: ACTIVE
               </div>
-              <div className={`flex items-center gap-2 text-[10px] font-black transition-all ${saveStatus === 'SAVED' ? 'text-green-500' : saveStatus === 'SAVING' ? 'text-yellow-500 animate-pulse' : 'text-white/40'}`}>
-                 <RefreshCw size={12} className={saveStatus === 'SAVING' ? 'animate-spin' : ''} />
+              <div className={`flex items-center gap-2 text-[9px] md:text-[10px] font-black transition-all ${saveStatus === 'SAVED' ? 'text-green-500' : saveStatus === 'SAVING' ? 'text-yellow-500 animate-pulse' : 'text-white/40'}`}>
+                 {saveStatus === 'SAVED' ? <CheckCircle2 size={12} /> : <RefreshCw size={12} className={saveStatus === 'SAVING' ? 'animate-spin' : ''} />}
                  {saveStatus === 'IDLE' ? 'READY' : saveStatus}
               </div>
-              <button onClick={handleLogoutClick} className="flex items-center gap-2 text-[10px] font-black uppercase text-red-500/50 hover:text-red-500 transition-colors">
+              <button onClick={handleLogoutClick} className="flex items-center gap-2 text-[9px] md:text-[10px] font-black uppercase text-red-500/50 hover:text-red-500 transition-colors">
                 <LogOut size={12} />
-                SECURE_LOGOUT
+                LOGOUT
               </button>
            </div>
         </div>
 
-        <header className="mb-24 space-y-8 reveal">
-          <div className="flex items-center gap-4 text-[#8E4E35] font-black uppercase tracking-[0.8em] text-[12px]">
-            <ShieldCheck size={20} />
+        <header className="mb-12 md:mb-24 space-y-4 md:space-y-8 reveal text-center lg:text-left">
+          <div className="flex items-center justify-center lg:justify-start gap-3 md:gap-4 text-[#8E4E35] font-black uppercase tracking-[0.5em] md:tracking-[0.8em] text-[10px] md:text-[12px]">
+            <ShieldCheck size={18} className="md:w-5 md:h-5" />
             MAISON_ADMIN_CMD
           </div>
-          <h1 className="text-6xl md:text-[8vw] leading-none tracking-tighter serif italic text-white/90">
+          <h1 className="text-4xl md:text-7xl lg:text-[8vw] leading-none tracking-tighter serif italic text-white/90">
             Control <span className="text-[#8E4E35]">Center.</span>
           </h1>
         </header>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
-          {/* Navigation Sidebar */}
-          <nav className="lg:col-span-3 space-y-4 reveal">
-            {(['Identity', 'Registry', 'Philosophy', 'Methodology', 'Journal'] as Tab[]).map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`w-full flex items-center justify-between p-6 text-[10px] font-black uppercase tracking-[0.4em] transition-all border ${
-                  activeTab === tab 
-                  ? 'bg-[#8E4E35] text-white border-[#8E4E35] shadow-[0_0_40px_rgba(142,78,53,0.3)] translate-x-4' 
-                  : 'bg-white/5 text-white/30 border-white/5 hover:bg-white/10 hover:text-white'
-                }`}
-              >
-                <div className="flex items-center gap-4">
-                  {tab === 'Identity' && <Globe size={14} />}
-                  {tab === 'Registry' && <Layers size={14} />}
-                  {tab === 'Philosophy' && <BookOpen size={14} />}
-                  {tab === 'Methodology' && <Edit3 size={14} />}
-                  {tab === 'Journal' && <FileText size={14} />}
-                  {tab}
-                </div>
-                {activeTab === tab && <MoveRight size={14} />}
-              </button>
-            ))}
-            
-            <div className="mt-20 p-8 border border-white/5 bg-black/20 space-y-6">
-               <h4 className="text-[10px] uppercase font-black text-white/20 tracking-[0.5em]">Terminal Meta</h4>
-               <div className="space-y-3 text-[9px] text-white/30 uppercase tracking-widest">
-                  <div className="flex justify-between">
-                     <span>REGISTRY_ENTRIES</span>
-                     <span className="text-white/60">{products.length}</span>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 md:gap-12 items-start">
+          <nav className="lg:col-span-3 lg:block reveal">
+            <div className="flex lg:flex-col overflow-x-auto lg:overflow-x-visible pb-4 lg:pb-0 gap-3 md:gap-4 no-scrollbar">
+              {(['Identity', 'Registry', 'Philosophy', 'Methodology', 'Journal'] as Tab[]).map((tab) => (
+                <button
+                  key={tab}
+                  onClick={() => setActiveTab(tab)}
+                  className={`flex-shrink-0 lg:w-full flex items-center justify-between p-4 md:p-6 text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em] transition-all border ${
+                    activeTab === tab 
+                    ? 'bg-[#8E4E35] text-white border-[#8E4E35] shadow-lg lg:translate-x-4' 
+                    : 'bg-white/5 text-white/30 border-white/5 hover:bg-white/10'
+                  }`}
+                >
+                  <div className="flex items-center gap-3 md:gap-4">
+                    {tab === 'Identity' && <Globe size={14} />}
+                    {tab === 'Registry' && <Layers size={14} />}
+                    {tab === 'Philosophy' && <BookOpen size={14} />}
+                    {tab === 'Methodology' && <Edit3 size={14} />}
+                    {tab === 'Journal' && <FileText size={14} />}
+                    {tab}
                   </div>
-                  <div className="flex justify-between">
-                     <span>ATELIER_LOGS</span>
-                     <span className="text-white/60">{siteContent.notes.entries.length}</span>
-                  </div>
-                  <div className="flex justify-between">
-                     <span>SECURITY_LEVEL</span>
-                     <span className="text-[#8E4E35]">MAISON_ELITE</span>
-                  </div>
-               </div>
+                  <MoveRight size={14} className={`hidden lg:block ${activeTab === tab ? 'opacity-100' : 'opacity-0'}`} />
+                </button>
+              ))}
             </div>
           </nav>
 
-          {/* Main Dashboard Panel */}
-          <div className="lg:col-span-9 bg-[#1A1816] border border-white/10 p-8 md:p-16 shadow-[0_40px_100px_rgba(0,0,0,0.5)] reveal">
+          <div className="lg:col-span-9 bg-[#1A1816] border border-white/10 p-6 md:p-12 lg:p-16 shadow-2xl reveal">
             
-            {/* BRAND IDENTITY */}
             {activeTab === 'Identity' && (
-              <div className="space-y-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="border-b border-white/5 pb-12 flex justify-between items-end">
+              <div className="space-y-12 md:space-y-20 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="border-b border-white/5 pb-8 md:pb-12 flex justify-between items-end">
                    <div>
-                      <h2 className="text-4xl serif italic text-white/90">Global Identity</h2>
-                      <p className="text-[10px] uppercase text-white/20 tracking-widest mt-2">Manage Maison core identifiers.</p>
+                      <h2 className="text-3xl md:text-4xl serif italic text-white/90">Global Identity</h2>
+                      <p className="text-[9px] md:text-[10px] uppercase text-white/20 tracking-widest mt-2">Manage core identifiers.</p>
                    </div>
-                   <Settings size={24} className="text-white/10" />
+                   <Settings size={20} className="text-white/10 md:w-6 md:h-6" />
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
-                   <div className="space-y-4">
-                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Maison Name</label>
-                      <input className="w-full bg-black/20 border-b border-white/10 p-4 text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-16">
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Maison Name</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-xl md:text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
                         value={siteContent.brand.name} onChange={(e) => updateBrand('name', e.target.value)} />
                    </div>
-                   <div className="space-y-4">
-                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Sub-Brand Label</label>
-                      <input className="w-full bg-black/20 border-b border-white/10 p-4 text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Sub-Brand Label</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-xl md:text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
                         value={siteContent.brand.subBrand} onChange={(e) => updateBrand('subBrand', e.target.value)} />
                    </div>
-                   <div className="space-y-4">
-                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Headquarters Location</label>
-                      <input className="w-full bg-black/20 border-b border-white/10 p-4 text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Location</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-xl md:text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
                         value={siteContent.brand.location} onChange={(e) => updateBrand('location', e.target.value)} />
                    </div>
-                   <div className="space-y-4">
-                      <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Hero Campaign Title</label>
-                      <input className="w-full bg-black/20 border-b border-white/10 p-4 text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Hero Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-xl md:text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
                         value={siteContent.brand.heroTitle} onChange={(e) => updateBrand('heroTitle', e.target.value)} />
                    </div>
                 </div>
                 <div className="space-y-4">
-                    <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Campaign Narrative</label>
-                    <textarea rows={2} className="w-full bg-black/20 border border-white/5 p-6 text-xl italic serif outline-none focus:border-[#8E4E35] transition-colors resize-none" 
-                      value={siteContent.brand.heroSubtitle} onChange={(e) => updateBrand('heroSubtitle', e.target.value)} />
-                </div>
-                <div className="space-y-4">
-                    <label className="text-[10px] uppercase font-black text-white/30 tracking-widest">Global Manifesto Quote</label>
-                    <textarea rows={3} className="w-full bg-black/40 border border-white/5 p-8 text-xl serif italic outline-none focus:border-[#8E4E35] transition-colors resize-none text-[#8E4E35]" 
+                    <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Manifesto Quote</label>
+                    <textarea rows={3} className="w-full bg-black/40 border border-white/5 p-6 md:p-8 text-lg md:text-xl serif italic outline-none focus:border-[#8E4E35] transition-colors resize-none text-[#8E4E35] leading-relaxed" 
                       value={siteContent.brand.manifestoQuote} onChange={(e) => updateBrand('manifestoQuote', e.target.value)} />
                 </div>
               </div>
             )}
 
-            {/* PRODUCT REGISTRY */}
             {activeTab === 'Registry' && (
-              <div className="space-y-24 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                <div className="border-b border-white/5 pb-12 flex justify-between items-end">
+              <div className="space-y-16 md:space-y-24 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="border-b border-white/5 pb-8 md:pb-12 flex justify-between items-end">
                    <div>
-                     <h2 className="text-4xl serif italic text-white/90">The Registry Index</h2>
-                     <p className="text-[10px] uppercase text-white/20 tracking-widest mt-2">Identification and restoration logs.</p>
+                     <h2 className="text-3xl md:text-4xl serif italic text-white/90">Registry Index</h2>
+                     <p className="text-[9px] md:text-[10px] uppercase text-white/20 tracking-widest mt-2">Identification logs.</p>
                    </div>
-                   <Layers size={24} className="text-white/10" />
+                   <Layers size={20} className="text-white/10 md:w-6 md:h-6" />
                 </div>
 
-                <div className="bg-black/30 border border-white/5 p-10 space-y-12 shadow-inner">
-                   <div className="flex items-center gap-4 mb-6">
-                      <Plus size={16} className="text-[#8E4E35]" />
-                      <span className="text-[10px] font-black uppercase tracking-[0.4em]">RECORD_NEW_FINDING</span>
+                <div className="bg-black/30 border border-white/5 p-6 md:p-10 space-y-10 shadow-inner">
+                   <div className="flex items-center gap-3 mb-4 md:mb-6">
+                      <Plus size={14} className="text-[#8E4E35]" />
+                      <span className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.3em] md:tracking-[0.4em]">RECORD_NEW_FINDING</span>
                    </div>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                      <div className="space-y-4">
-                         <label className="text-[10px] font-black uppercase text-white/20 tracking-widest">Silhouette Designation</label>
-                         <input className="w-full bg-white/5 border-b border-white/10 p-3 text-lg font-bold outline-none focus:border-[#8E4E35]" 
-                           value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} placeholder="e.g., Gikomba Shell 01" />
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                      <div className="space-y-3 md:space-y-4">
+                         <label className="text-[9px] md:text-[10px] font-black uppercase text-white/20 tracking-widest">Designation</label>
+                         <input className="w-full bg-white/5 border-b border-white/10 p-2 md:p-3 text-base md:text-lg font-bold outline-none focus:border-[#8E4E35]" 
+                           value={newProduct.name} onChange={e => setNewProduct({...newProduct, name: e.target.value})} placeholder="e.g., Gikomba Shell" />
                       </div>
-                      <div className="space-y-4">
-                         <label className="text-[10px] font-black uppercase text-white/20 tracking-widest">Classification</label>
-                         <select className="w-full bg-white/5 border-b border-white/10 p-3 text-[10px] uppercase font-black outline-none"
+                      <div className="space-y-3 md:space-y-4">
+                         <label className="text-[9px] md:text-[10px] font-black uppercase text-white/20 tracking-widest">Classification</label>
+                         <select className="w-full bg-white/5 border-b border-white/10 p-2 md:p-3 text-[9px] md:text-[10px] uppercase font-black outline-none"
                            value={newProduct.category} onChange={e => setNewProduct({...newProduct, category: e.target.value})}>
                            {CATEGORIES.filter(c => c !== 'All').map(c => <option key={c} value={c} className="bg-[#121212]">{c}</option>)}
                          </select>
                       </div>
                    </div>
-                   <div className="flex flex-col md:flex-row gap-6">
-                      <button onClick={handleGenerateEditorial} disabled={isGenerating} className="flex-grow flex items-center justify-center gap-3 bg-white/5 border border-white/10 py-5 text-[10px] font-black uppercase tracking-widest hover:bg-[#8E4E35] transition-all disabled:opacity-20 group">
-                        <Cpu size={16} className="group-hover:rotate-180 transition-transform duration-700" /> {isGenerating ? 'ANALYZING...' : 'AI_THESIS_SYNTHESIS'}
+
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+                      <FileUpload 
+                        label="Hero_Plate (Cloudinary)" 
+                        onUpload={(id) => setNewProduct(prev => ({ ...prev, images: [id, ...(prev.images?.slice(1) || [])] }))}
+                        currentPublicId={newProduct.images?.[0]}
+                      />
+                      <FileUpload 
+                        label="Alt_Plate (Cloudinary)" 
+                        onUpload={(id) => setNewProduct(prev => ({ ...prev, images: [prev.images?.[0] || '', id] }))}
+                        currentPublicId={newProduct.images?.[1]}
+                      />
+                   </div>
+
+                   <div className="flex flex-col sm:flex-row gap-4 md:gap-6">
+                      <button onClick={handleGenerateEditorial} disabled={isGenerating} className="flex-grow flex items-center justify-center gap-3 bg-white/5 border border-white/10 py-4 md:py-5 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-[#8E4E35] transition-all disabled:opacity-20 group">
+                        <Cpu size={14} className="group-hover:rotate-180 transition-transform duration-700" /> {isGenerating ? 'ANALYZING...' : 'AI_SYNTHESIS'}
                       </button>
-                      <button onClick={handleAddProduct} className="flex-grow flex items-center justify-center gap-3 bg-[#8E4E35] text-white py-5 text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all shadow-[0_10px_30px_rgba(142,78,53,0.4)]">
-                        <Save size={16} /> COMMMIT_TO_REGISTRY
+                      <button onClick={handleAddProduct} className="flex-grow flex items-center justify-center gap-3 bg-[#8E4E35] text-white py-4 md:py-5 text-[9px] md:text-[10px] font-black uppercase tracking-widest hover:bg-white hover:text-black transition-all">
+                        <Save size={14} /> COMMIT_TO_FIRESTORE
                       </button>
                    </div>
-                   {newProduct.editorial && (
-                     <div className="p-8 bg-black/40 border border-[#8E4E35]/30 text-lg serif italic text-white/60 leading-relaxed">
-                        <span className="text-[8px] mono uppercase text-[#8E4E35] block mb-4">SYNTHESIZED_EDITORIAL:</span>
-                        {newProduct.editorial}
-                     </div>
-                   )}
                 </div>
 
-                <div className="space-y-8">
-                   <h3 className="text-[10px] font-black uppercase tracking-[0.5em] text-white/10">Active Index Entries ({products.length})</h3>
-                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-6 md:space-y-8">
+                   <h3 className="text-[9px] md:text-[10px] font-black uppercase tracking-[0.4em] md:tracking-[0.5em] text-white/10">Active Index Entries ({products.length})</h3>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                       {products.map(p => (
-                        <div key={p.id} className="flex items-center justify-between p-6 bg-black/20 border border-white/5 hover:border-[#8E4E35]/40 transition-all group">
-                           <div className="flex items-center gap-8">
-                              <div className="w-16 h-20 bg-black overflow-hidden border border-white/10">
-                                 <img src={p.images[0]} className="w-full h-full object-cover grayscale opacity-30 group-hover:opacity-100 transition-all duration-700" />
+                        <div key={p.id} className="flex items-center justify-between p-4 md:p-6 bg-black/20 border border-white/5 hover:border-[#8E4E35]/40 transition-all group rounded-sm">
+                           <div className="flex items-center gap-4 md:gap-8">
+                              <div className="w-12 h-16 md:w-16 md:h-20 bg-black overflow-hidden border border-white/10 flex-shrink-0">
+                                 <img 
+                                  src={getCloudinaryUrl(p.images[0], "w_150,c_fill")} 
+                                  className="w-full h-full object-cover grayscale opacity-30 group-hover:opacity-100 transition-all" 
+                                 />
                               </div>
-                              <div>
-                                 <h4 className="text-[12px] font-black uppercase tracking-widest">{p.name}</h4>
-                                 <p className="text-[8px] uppercase tracking-widest text-white/20 mt-1">{p.id} • {p.category}</p>
+                              <div className="min-w-0">
+                                 <h4 className="text-[10px] md:text-[12px] font-black uppercase tracking-widest truncate">{p.name}</h4>
+                                 <p className="text-[7px] md:text-[8px] uppercase tracking-widest text-white/20 mt-1">{p.id} • {p.category}</p>
                               </div>
                            </div>
-                           <button onClick={() => handleDeleteProduct(p.id)} className="p-4 text-white/10 hover:text-red-500 transition-colors">
-                              <Trash2 size={16} />
+                           <button onClick={() => handleDeleteProduct(p.id)} className="p-3 md:p-4 text-white/10 hover:text-red-500 transition-colors">
+                              <Trash2 size={14} />
                            </button>
                         </div>
                       ))}
@@ -317,67 +384,6 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
                 </div>
               </div>
             )}
-
-            {/* JOURNAL ENTRIES */}
-            {activeTab === 'Journal' && (
-              <div className="space-y-16 animate-in fade-in slide-in-from-bottom-4 duration-700">
-                 <div className="border-b border-white/5 pb-12 flex justify-between items-end">
-                   <div>
-                     <h2 className="text-4xl serif italic text-white/90">Studio Journal</h2>
-                     <p className="text-[10px] uppercase text-white/20 tracking-widest mt-2">Historical reflection and process logs.</p>
-                   </div>
-                   <button onClick={addJournalEntry} className="flex items-center gap-3 text-[10px] font-black uppercase bg-[#8E4E35] text-white px-8 py-4 rounded-full shadow-xl hover:bg-white hover:text-black transition-all">
-                      <Plus size={14} /> Log Entry
-                   </button>
-                </div>
-                <div className="space-y-10">
-                   {siteContent.notes.entries.map((entry, idx) => (
-                     <div key={entry.id} className="p-10 bg-black/20 border border-white/5 space-y-8 group">
-                        <div className="flex justify-between items-start">
-                           <div className="flex-grow space-y-6">
-                              <div className="flex flex-col md:flex-row gap-6">
-                                <input className="flex-grow bg-transparent border-b border-white/5 py-2 text-2xl serif italic outline-none focus:border-[#8E4E35] transition-colors"
-                                  placeholder="Entry Title" value={entry.title} onChange={e => {
-                                    const newEntries = [...siteContent.notes.entries];
-                                    newEntries[idx].title = e.target.value;
-                                    onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, entries: newEntries } });
-                                  }} />
-                                <input className="w-48 bg-transparent border-b border-white/5 py-2 text-[10px] uppercase tracking-widest font-black text-[#8E4E35] outline-none"
-                                  placeholder="Date Stamp" value={entry.date} onChange={e => {
-                                    const newEntries = [...siteContent.notes.entries];
-                                    newEntries[idx].date = e.target.value;
-                                    onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, entries: newEntries } });
-                                  }} />
-                              </div>
-                              <textarea rows={4} className="w-full bg-black/40 border border-white/5 p-8 text-xl serif italic outline-none focus:border-[#8E4E35] transition-colors resize-none text-white/40 leading-relaxed"
-                                value={entry.content} onChange={e => {
-                                  const newEntries = [...siteContent.notes.entries];
-                                  newEntries[idx].content = e.target.value;
-                                  onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, entries: newEntries } });
-                                }} />
-                           </div>
-                           <button onClick={() => deleteJournalEntry(entry.id)} className="p-4 text-white/5 hover:text-red-500 transition-colors ml-4">
-                             <Trash2 size={18} />
-                           </button>
-                        </div>
-                     </div>
-                   ))}
-                </div>
-              </div>
-            )}
-
-            {/* FALLBACK TABS (Philosophy/Methodology) handled simply for brevity */}
-            {['Philosophy', 'Methodology'].includes(activeTab) && (
-              <div className="py-20 text-center space-y-8 text-white/20">
-                <Edit3 size={48} className="mx-auto opacity-10" />
-                <p className="text-[10px] uppercase tracking-[1em]">Section_Operational_v2</p>
-                <p className="serif italic text-xl">Module integrated in full site logic.</p>
-                <p className="max-w-xs mx-auto text-[9px] uppercase tracking-widest leading-loose">
-                  Content for this sector is synchronized via the global Maison manifest document. Proceed with manual overrides only if necessary.
-                </p>
-              </div>
-            )}
-            
           </div>
         </div>
       </div>
