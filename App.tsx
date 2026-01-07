@@ -1,17 +1,20 @@
 
 import React, { useState, useEffect } from 'react';
-import { HashRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { HashRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import Home from './pages/Home';
 import Archive from './pages/Archive';
+import Gallery from './pages/Gallery';
 import ProductDetail from './pages/ProductDetail';
 import Philosophy from './pages/Philosophy';
 import Process from './pages/Process';
 import Notes from './pages/Notes';
 import Admin from './pages/Admin';
+import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import { Product, SiteContent } from './types';
 import { INITIAL_PRODUCTS, INITIAL_SITE_CONTENT } from './constants';
 import { Menu, X, ShoppingBag, Database, ShieldCheck } from 'lucide-react';
+import { Logo } from './components/Logo';
 
 const ScrollToTop = () => {
   const { pathname } = useLocation();
@@ -69,6 +72,7 @@ const Header = ({ content }: { content: SiteContent }) => {
   }, [pathname]);
 
   const navLinksLeft = [
+    { name: 'Gallery', path: '/gallery' },
     { name: 'The Findings', path: '/archive' },
     { name: 'Philosophy', path: '/philosophy' },
   ];
@@ -108,10 +112,8 @@ const Header = ({ content }: { content: SiteContent }) => {
           </nav>
 
           <div className="flex-grow flex justify-center lg:w-1/3">
-            <Link to="/" className="flex flex-col items-center gap-1 group relative z-[110]">
-              <span className={`mono text-[14px] md:text-[20px] font-black tracking-[1em] uppercase transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`}>
-                {content.brand.name}
-              </span>
+            <Link to="/" className="flex flex-col items-center gap-2 group relative z-[110]">
+              <Logo className={`h-8 md:h-10 transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`} />
               <span className={`mono text-[7px] tracking-[0.6em] uppercase opacity-40 transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`}>
                 {content.brand.subBrand} • {content.brand.location}
               </span>
@@ -177,8 +179,8 @@ const Footer = ({ content }: { content: SiteContent }) => (
     <div className="max-w-[1800px] mx-auto px-8 md:px-16">
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
         <div className="lg:col-span-4 space-y-12">
-           <Link to="/" className="flex flex-col gap-2">
-              <span className="mono text-2xl font-black tracking-[0.8em] uppercase">{content.brand.name}</span>
+           <Link to="/" className="flex flex-col items-start gap-4">
+              <Logo className="h-10 text-white" />
               <span className="mono text-[10px] tracking-[0.4em] uppercase text-white/30">{content.brand.subBrand} — {content.brand.location}</span>
            </Link>
            <p className="max-w-md text-xl md:text-2xl text-white/40 font-light italic serif leading-relaxed">
@@ -190,6 +192,7 @@ const Footer = ({ content }: { content: SiteContent }) => (
            <div className="space-y-10">
              <h4 className="mono text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">The Archive</h4>
              <ul className="space-y-5 text-[11px] mono uppercase tracking-[0.3em] font-black text-white/50">
+               <li><Link to="/gallery" className="hover:text-white transition-colors">Visual Gallery</Link></li>
                <li><Link to="/archive" className="hover:text-white transition-colors">The Findings</Link></li>
                <li><Link to="/philosophy" className="hover:text-white transition-colors">Manifesto</Link></li>
                <li><Link to="/process" className="hover:text-white transition-colors">Methodology</Link></li>
@@ -205,7 +208,7 @@ const Footer = ({ content }: { content: SiteContent }) => (
            <div className="space-y-10">
              <h4 className="mono text-[10px] font-black text-white/20 uppercase tracking-[0.4em]">Operational Portal</h4>
              <Link 
-               to="/admin" 
+               to="/login" 
                className="group flex items-center gap-4 mono text-[9px] uppercase tracking-[0.5em] font-black text-[#8E4E35] bg-[#8E4E35]/10 px-6 py-4 border border-[#8E4E35]/30 hover:bg-[#8E4E35] hover:text-white transition-all w-fit rounded-sm shadow-2xl"
              >
                <Database size={16} />
@@ -219,7 +222,7 @@ const Footer = ({ content }: { content: SiteContent }) => (
       <div className="mt-40 pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-10">
         <span className="mono text-[9px] uppercase tracking-[0.4em] text-white/10">© 2024 {content.brand.name} MAISON D'ARCHIVE. ALL RIGHTS SECURED.</span>
         <div className="flex flex-wrap justify-center items-center gap-12 mono text-[9px] uppercase tracking-[0.4em] text-white/10">
-           <span className="text-[#8E4E35] font-black">{content.brand.location} • PARIS • TOKYO</span>
+           <span className="text-[#8E4E35] font-black">{content.brand.location}, KENYA</span>
            <span>RESTRICTED_ACCESS_PROTOCOL</span>
         </div>
       </div>
@@ -255,6 +258,18 @@ const AppContent: React.FC = () => {
       return INITIAL_SITE_CONTENT;
     }
   });
+  
+  const [isAuthenticated, setIsAuthenticated] = useState(() => sessionStorage.getItem('rawline_auth') === 'true');
+
+  const handleLogin = () => {
+    sessionStorage.setItem('rawline_auth', 'true');
+    setIsAuthenticated(true);
+  };
+
+  const handleLogout = () => {
+    sessionStorage.removeItem('rawline_auth');
+    setIsAuthenticated(false);
+  };
 
   const updateProducts = (updated: Product[]) => {
     setProducts(updated);
@@ -277,11 +292,28 @@ const AppContent: React.FC = () => {
           <Routes>
             <Route path="/" element={<Home products={products} content={siteContent} />} />
             <Route path="/archive" element={<Archive products={products} />} />
+            <Route path="/gallery" element={<Gallery />} />
             <Route path="/product/:id" element={<ProductDetail products={products} />} />
             <Route path="/philosophy" element={<Philosophy content={siteContent} />} />
             <Route path="/process" element={<Process content={siteContent} />} />
             <Route path="/notes" element={<Notes content={siteContent} />} />
-            <Route path="/admin" element={<Admin products={products} siteContent={siteContent} onUpdateProducts={updateProducts} onUpdateContent={updateSiteContent} />} />
+            <Route path="/login" element={<Login onLogin={handleLogin} />} />
+            <Route 
+              path="/admin" 
+              element={
+                isAuthenticated ? (
+                  <Admin 
+                    products={products} 
+                    siteContent={siteContent} 
+                    onUpdateProducts={updateProducts} 
+                    onUpdateContent={updateSiteContent} 
+                    onLogout={handleLogout}
+                  />
+                ) : (
+                  <Navigate to="/login" replace />
+                )
+              } 
+            />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>

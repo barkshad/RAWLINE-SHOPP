@@ -27,6 +27,13 @@ export interface ProcessStep {
   image: string;
 }
 
+export interface GalleryItem {
+  id: string;
+  image: string;
+  title: string;
+  description: string;
+}
+
 export interface SiteContent {
   brand: {
     name: string;
@@ -35,6 +42,7 @@ export interface SiteContent {
     description: string;
     heroTitle: string;
     heroSubtitle: string;
+    heroTagline: string;
     manifestoQuote: string;
   };
   philosophy: {

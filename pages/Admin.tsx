@@ -6,33 +6,30 @@ import { generateEditorialThesis } from '../services/geminiService';
 import { 
   Database, Cpu, Plus, FileText, Settings, BookOpen, 
   Layers, Edit3, Trash2, MoveRight, ShieldCheck, 
-  Activity, Globe, Terminal, RefreshCw, Save
+  Activity, Globe, Terminal, RefreshCw, Save, LogOut
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 interface AdminProps {
   products: Product[];
   siteContent: SiteContent;
   onUpdateProducts: (products: Product[]) => void;
   onUpdateContent: (content: SiteContent) => void;
+  onLogout: () => void;
 }
 
 type Tab = 'Identity' | 'Registry' | 'Philosophy' | 'Methodology' | 'Journal';
 
-const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, onUpdateContent }) => {
+const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, onUpdateContent, onLogout }) => {
   const [activeTab, setActiveTab] = useState<Tab>('Identity');
   const [isGenerating, setIsGenerating] = useState(false);
   const [saveStatus, setSaveStatus] = useState<'IDLE' | 'SAVING' | 'SAVED'>('IDLE');
+  const navigate = useNavigate();
 
-  const [newProduct, setNewProduct] = useState<Partial<Product>>({
-    name: '',
-    category: 'Tops',
-    price: 0,
-    description: '',
-    editorial: '',
-    fabric: '',
-    fit: '',
-    images: ['https://picsum.photos/1000/1500?random=' + Math.floor(Math.random() * 1000)],
-  });
+  const handleLogoutClick = () => {
+    onLogout();
+    navigate('/login');
+  };
 
   const handleSaveAnimation = () => {
     setSaveStatus('SAVING');
@@ -50,6 +47,17 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
     setNewProduct(prev => ({ ...prev, editorial: thesis }));
     setIsGenerating(false);
   };
+
+  const [newProduct, setNewProduct] = useState<Partial<Product>>({
+    name: '',
+    category: 'Tops',
+    price: 0,
+    description: '',
+    editorial: '',
+    fabric: '',
+    fit: '',
+    images: ['https://picsum.photos/1000/1500?random=' + Math.floor(Math.random() * 1000)],
+  });
 
   const handleAddProduct = () => {
     const p: Product = {
@@ -131,6 +139,10 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
                  <RefreshCw size={12} className={saveStatus === 'SAVING' ? 'animate-spin' : ''} />
                  {saveStatus === 'IDLE' ? 'READY' : saveStatus}
               </div>
+              <button onClick={handleLogoutClick} className="flex items-center gap-2 text-[10px] font-black uppercase text-red-500/50 hover:text-red-500 transition-colors">
+                <LogOut size={12} />
+                SECURE_LOGOUT
+              </button>
            </div>
         </div>
 

@@ -1,5 +1,5 @@
 
-import { Product, SiteContent } from './types';
+import { Product, SiteContent, GalleryItem } from './types';
 
 export const COLORS = {
   parchment: '#F2EDE4', /* Tea-stained paper */
@@ -10,6 +10,21 @@ export const COLORS = {
   ink: '#1A1816',      /* 1920s typewriter ink */
   sepia: '#5E4B3C'     /* Oxidized photographic silver */
 };
+
+export const GALLERY_ITEMS: GalleryItem[] = [
+  { id: 'look-01', image: 'https://picsum.photos/seed/look01/800/1200', title: 'Look 01: Coastal Drift', description: 'Featuring the Mombasa Linen Trouser and a 70s silk shirt find.' },
+  { id: 'look-02', image: 'https://picsum.photos/seed/look02/900/1200', title: 'Look 02: Rift Valley Form', description: 'A study in structure with the Gikomba Work Shell.' },
+  { id: 'look-03', image: 'https://picsum.photos/seed/look03/800/1000', title: 'Look 03: Urban Archive', description: 'Eastleigh Pleat Archive paired with a deadstock leather harness.' },
+  { id: 'look-04', image: 'https://picsum.photos/seed/look04/900/1400', title: 'Look 04: Monochromatic Study', description: 'Layered textures of charcoal and ink-dyed canvas.' },
+  { id: 'look-05', image: 'https://picsum.photos/seed/look05/800/1100', title: 'Look 05: The Curator', description: 'A minimalist approach to archival workwear.' },
+  { id: 'look-06', image: 'https://picsum.photos/seed/look06/900/1300', title: 'Look 06: Sepia Tones', description: 'Exploring the warmth of ochre and sun-bleached cotton.' },
+  { id: 'look-07', image: 'https://picsum.photos/seed/look07/800/1200', title: 'Look 07: Industrial Silhouette', description: 'The intersection of utility and form.' },
+  { id: 'look-08', image: 'https://picsum.photos/seed/look08/900/1100', title: 'Look 08: Soft Structure', description: 'Gabardine and silk in a dialogue of movement.' },
+  { id: 'look-09', image: 'https://picsum.photos/seed/look09/800/1300', title: 'Look 09: Found Object', description: 'Styling a single, significant archival discovery.' },
+  { id: 'look-10', image: 'https://picsum.photos/seed/look10/900/1200', title: 'Look 10: The Long Line', description: 'An emphasis on verticality and drape.' },
+  { id: 'look-11', image: 'https://picsum.photos/seed/look11/800/1000', title: 'Look 11: Atelier Study', description: 'An informal studio documentation of a work-in-progress.' },
+  { id: 'look-12', image: 'https://picsum.photos/seed/look12/900/1500', title: 'Look 12: Heritage Form', description: 'A direct conversation with a historical Kenyan textile.' },
+];
 
 export const INITIAL_PRODUCTS: Product[] = [
   {
@@ -45,9 +60,10 @@ export const INITIAL_SITE_CONTENT: SiteContent = {
     name: "RAWLINE",
     subBrand: "MAISON D'ARCHIVE",
     location: "NAIROBI",
-    description: "A high-luxury investigation into Kenya's historical silhouettes. We identify, rescue, and restructure the findings of our heritage for the next generation.",
+    description: "A world-class fashion house and high-luxury investigation into Kenya's historical silhouettes. We identify, rescue, and restructure timeless fits from our heritage for the next generation.",
     heroTitle: "Found & Restored.",
-    heroSubtitle: "Documenting the structural soul of Kenya",
+    heroSubtitle: "Timeless fits, restored for the modern archive.",
+    heroTagline: "Designed & Styled in Kenya",
     manifestoQuote: "We identify historical excellence and re-state its purpose for the next 50 years. True luxury is the longevity of the found form."
   },
   philosophy: {

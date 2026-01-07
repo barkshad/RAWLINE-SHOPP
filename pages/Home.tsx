@@ -13,13 +13,21 @@ const Home: React.FC<HomeProps> = ({ products, content }) => {
   return (
     <div className="bg-[#F2EDE4]">
       {/* Dynamic Campaign Hero */}
-      <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#F2EDE4]">
-        <div className="absolute top-0 right-0 w-[80vw] h-full opacity-10 pointer-events-none bg-gradient-to-bl from-[#8E4E35]/30 via-transparent to-transparent blur-3xl"></div>
+      <section className="min-h-screen flex items-center justify-center relative overflow-hidden bg-[#1A1816]">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://picsum.photos/seed/nairobi-texture/1920/1080" 
+            alt="Nairobi Atelier Background"
+            className="w-full h-full object-cover grayscale opacity-20"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#F2EDE4] via-[#F2EDE4]/80 to-transparent"></div>
+        </div>
         
         <div className="max-w-[1800px] w-full mx-auto px-8 md:px-16 flex flex-col items-center relative z-10 pt-20">
           <div className="reveal text-center space-y-8 mb-20">
              <span className="mono text-[10px] md:text-[11px] font-black text-[#8E4E35] uppercase tracking-[1em] block">
-                SPRING / SUMMER 2024 — THE {content.brand.location} REGISTRY
+                {content.brand.heroTagline}
              </span>
              <h1 className="text-6xl md:text-[13vw] font-normal tracking-tighter serif italic text-[#1A1816] leading-[0.72] ink-bleed">
                 {content.brand.heroTitle}
