@@ -34,7 +34,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
   return (
     <div className="min-h-screen bg-[#121212] text-[#F2EDE4] flex flex-col items-center justify-center p-8 font-mono">
       <div className="w-full max-w-md text-center reveal">
-        <Logo className="h-16 text-white/50 mx-auto mb-8" />
+        <Logo className="text-5xl text-white/50 mx-auto mb-8" />
         <h1 className="flex items-center justify-center gap-4 text-lg font-black uppercase tracking-[0.4em] text-white/30 mb-2">
           <ShieldAlert size={18} className="text-[#8E4E35]" />
           Secure Terminal Access

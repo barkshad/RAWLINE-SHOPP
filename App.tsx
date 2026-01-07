@@ -113,10 +113,7 @@ const Header = ({ content }: { content: SiteContent }) => {
 
           <div className="flex-grow flex justify-center lg:w-1/3">
             <Link to="/" className="flex flex-col items-center gap-2 group relative z-[110]">
-              <Logo className={`h-8 md:h-10 transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`} />
-              <span className={`mono text-[7px] tracking-[0.6em] uppercase opacity-40 transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`}>
-                {content.brand.subBrand} • {content.brand.location}
-              </span>
+              <Logo className={`text-2xl md:text-3xl transition-colors duration-500 ${menuOpen ? 'text-white' : 'text-current'}`} />
             </Link>
           </div>
 
@@ -180,7 +177,7 @@ const Footer = ({ content }: { content: SiteContent }) => (
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-24">
         <div className="lg:col-span-4 space-y-12">
            <Link to="/" className="flex flex-col items-start gap-4">
-              <Logo className="h-10 text-white" />
+              <Logo className="text-3xl text-white" />
               <span className="mono text-[10px] tracking-[0.4em] uppercase text-white/30">{content.brand.subBrand} — {content.brand.location}</span>
            </Link>
            <p className="max-w-md text-xl md:text-2xl text-white/40 font-light italic serif leading-relaxed">
