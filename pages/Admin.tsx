@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Product, SiteContent } from '../types';
+import { Product, SiteContent, ProcessStep, Note } from '../types';
 import { CATEGORIES } from '../constants';
 import { generateEditorialThesis } from '../services/geminiService';
 import { uploadToCloudinary, getCloudinaryUrl } from '../services/cloudinary';
@@ -9,7 +9,7 @@ import {
   Database, Cpu, Plus, FileText, Settings, BookOpen, 
   Layers, Edit3, Trash2, MoveRight, ShieldCheck, 
   Activity, Globe, Terminal, RefreshCw, Save, LogOut,
-  Image as ImageIcon, Upload, Loader2, CheckCircle2
+  Image as ImageIcon, Upload, Loader2, CheckCircle2, X
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
@@ -173,6 +173,8 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
     }
   };
 
+  // --- Content Updates Helpers ---
+
   const updateBrand = (key: keyof SiteContent['brand'], val: string) => {
     onUpdateContent({ ...siteContent, brand: { ...siteContent.brand, [key]: val } });
     handleSaveAnimation();
@@ -183,16 +185,58 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
     handleSaveAnimation();
   };
 
-  const addProcessStep = () => {
-    const newSteps = [...siteContent.process.steps, { id: Date.now().toString(), title: 'New Step', description: 'Step description...', image: '' }];
-    onUpdateContent({ ...siteContent, process: { ...siteContent.process, steps: newSteps } });
+  // Process / Methodology Helpers
+  const updateProcess = (key: keyof SiteContent['process'], val: any) => {
+    onUpdateContent({ ...siteContent, process: { ...siteContent.process, [key]: val } });
     handleSaveAnimation();
   };
 
-  const addJournalEntry = () => {
-    const newEntries = [{ id: Date.now().toString(), title: 'New Studio Note', date: new Date().toLocaleDateString(), content: 'Journal entry...' }, ...siteContent.notes.entries];
-    onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, entries: newEntries } });
+  const updateStep = (index: number, key: keyof ProcessStep, val: string) => {
+    const newSteps = [...siteContent.process.steps];
+    newSteps[index] = { ...newSteps[index], [key]: val };
+    updateProcess('steps', newSteps);
+  };
+
+  const addProcessStep = () => {
+    const newSteps = [...siteContent.process.steps, { 
+      id: Date.now().toString(), 
+      title: 'New Method Step', 
+      description: 'Describe the archival process...', 
+      image: '' 
+    }];
+    updateProcess('steps', newSteps);
+  };
+
+  const removeProcessStep = (index: number) => {
+    const newSteps = siteContent.process.steps.filter((_, i) => i !== index);
+    updateProcess('steps', newSteps);
+  };
+
+  // Notes / Journal Helpers
+  const updateNotes = (key: keyof SiteContent['notes'], val: any) => {
+    onUpdateContent({ ...siteContent, notes: { ...siteContent.notes, [key]: val } });
     handleSaveAnimation();
+  };
+
+  const updateNoteEntry = (index: number, key: keyof Note, val: string) => {
+    const newEntries = [...siteContent.notes.entries];
+    newEntries[index] = { ...newEntries[index], [key]: val };
+    updateNotes('entries', newEntries);
+  };
+
+  const addNoteEntry = () => {
+    const newEntries = [{ 
+      id: Date.now().toString(), 
+      title: 'New Studio Reflection', 
+      date: new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' }).toUpperCase(), 
+      content: 'Record thoughts here...' 
+    }, ...siteContent.notes.entries];
+    updateNotes('entries', newEntries);
+  };
+
+  const removeNoteEntry = (index: number) => {
+    const newEntries = siteContent.notes.entries.filter((_, i) => i !== index);
+    updateNotes('entries', newEntries);
   };
 
   return (
@@ -296,6 +340,21 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
                       <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-xl md:text-2xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
                         value={siteContent.brand.heroTitle} onChange={(e) => updateBrand('heroTitle', e.target.value)} />
                    </div>
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Hero Subtitle</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-lg md:text-xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                        value={siteContent.brand.heroSubtitle} onChange={(e) => updateBrand('heroSubtitle', e.target.value)} />
+                   </div>
+                   <div className="space-y-3 md:space-y-4">
+                      <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Hero Tagline</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 md:p-4 text-lg md:text-xl font-light outline-none focus:border-[#8E4E35] transition-colors" 
+                        value={siteContent.brand.heroTagline} onChange={(e) => updateBrand('heroTagline', e.target.value)} />
+                   </div>
+                </div>
+                <div className="space-y-4">
+                    <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Brand Description</label>
+                    <textarea rows={4} className="w-full bg-black/40 border border-white/5 p-6 md:p-8 text-lg serif italic outline-none focus:border-[#8E4E35] transition-colors resize-none text-white/80 leading-relaxed" 
+                      value={siteContent.brand.description} onChange={(e) => updateBrand('description', e.target.value)} />
                 </div>
                 <div className="space-y-4">
                     <label className="text-[9px] md:text-[10px] uppercase font-black text-white/30 tracking-widest">Manifesto Quote</label>
@@ -381,6 +440,196 @@ const Admin: React.FC<AdminProps> = ({ products, siteContent, onUpdateProducts, 
                         </div>
                       ))}
                    </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Philosophy' && (
+              <div className="space-y-12 md:space-y-20 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="border-b border-white/5 pb-8 md:pb-12 flex justify-between items-end">
+                   <div>
+                      <h2 className="text-3xl md:text-4xl serif italic text-white/90">Maison Philosophy</h2>
+                      <p className="text-[9px] md:text-[10px] uppercase text-white/20 tracking-widest mt-2">Core values and manifesto.</p>
+                   </div>
+                   <BookOpen size={20} className="text-white/10 md:w-6 md:h-6" />
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Page Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg font-light outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.philosophy.title} onChange={(e) => updatePhilosophy('title', e.target.value)} />
+                  </div>
+                  <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Document ID</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg font-light outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.philosophy.documentId} onChange={(e) => updatePhilosophy('documentId', e.target.value)} />
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                    <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Main Manifesto Paragraph</label>
+                    <textarea rows={5} className="w-full bg-black/40 border border-white/5 p-6 text-xl serif italic outline-none focus:border-[#8E4E35] resize-none text-white/90 leading-relaxed" 
+                      value={siteContent.philosophy.mainParagraph} onChange={(e) => updatePhilosophy('mainParagraph', e.target.value)} />
+                </div>
+
+                <div className="grid grid-cols-1 gap-12 pt-8 border-t border-white/5">
+                   <div className="space-y-4">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Section 1 Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-xl serif italic outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.philosophy.sec1Title} onChange={(e) => updatePhilosophy('sec1Title', e.target.value)} />
+                   </div>
+                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      <div className="space-y-4">
+                          <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Section 1 Content</label>
+                          <textarea rows={6} className="w-full bg-black/20 border border-white/5 p-4 text-sm leading-relaxed outline-none focus:border-[#8E4E35] resize-none" 
+                            value={siteContent.philosophy.sec1Content} onChange={(e) => updatePhilosophy('sec1Content', e.target.value)} />
+                      </div>
+                      <div className="space-y-4">
+                          <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Section 2 Content</label>
+                          <textarea rows={6} className="w-full bg-black/20 border border-white/5 p-4 text-sm leading-relaxed outline-none focus:border-[#8E4E35] resize-none" 
+                            value={siteContent.philosophy.sec2Content} onChange={(e) => updatePhilosophy('sec2Content', e.target.value)} />
+                      </div>
+                   </div>
+                </div>
+
+                <div className="space-y-4 pt-8 border-t border-white/5">
+                    <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Highlight Quote</label>
+                    <textarea rows={3} className="w-full bg-black/40 border border-white/5 p-6 text-2xl serif italic outline-none focus:border-[#8E4E35] resize-none text-[#8E4E35]" 
+                      value={siteContent.philosophy.quote} onChange={(e) => updatePhilosophy('quote', e.target.value)} />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-white/5">
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Footer Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.philosophy.footerTitle} onChange={(e) => updatePhilosophy('footerTitle', e.target.value)} />
+                   </div>
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Footer Content</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.philosophy.footerContent} onChange={(e) => updatePhilosophy('footerContent', e.target.value)} />
+                   </div>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Methodology' && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                <div className="border-b border-white/5 pb-8 flex justify-between items-end">
+                   <div>
+                      <h2 className="text-3xl md:text-4xl serif italic text-white/90">Methodology & Process</h2>
+                      <p className="text-[9px] md:text-[10px] uppercase text-white/20 tracking-widest mt-2">Restoration workflow documentation.</p>
+                   </div>
+                   <Edit3 size={20} className="text-white/10" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Section Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.process.title} onChange={(e) => updateProcess('title', e.target.value)} />
+                   </div>
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Document ID</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.process.documentId} onChange={(e) => updateProcess('documentId', e.target.value)} />
+                   </div>
+                </div>
+
+                <div className="space-y-8">
+                  {siteContent.process.steps.map((step, index) => (
+                    <div key={step.id} className="bg-black/20 border border-white/5 p-6 md:p-8 rounded-sm group relative">
+                       <button onClick={() => removeProcessStep(index)} className="absolute top-4 right-4 text-white/10 hover:text-red-500 transition-colors">
+                          <X size={16} />
+                       </button>
+                       <span className="absolute top-4 left-6 text-[100px] leading-none font-black text-white/[0.02] pointer-events-none select-none -translate-x-4 -translate-y-4">
+                         0{index + 1}
+                       </span>
+                       
+                       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 relative z-10">
+                          <div className="lg:col-span-4">
+                             <FileUpload 
+                               label="Step_Visualization" 
+                               currentPublicId={step.image}
+                               onUpload={(id) => updateStep(index, 'image', id)}
+                             />
+                          </div>
+                          <div className="lg:col-span-8 space-y-6">
+                             <div className="space-y-3">
+                                <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Step Title</label>
+                                <input className="w-full bg-transparent border-b border-white/10 p-2 text-xl font-bold outline-none focus:border-[#8E4E35]" 
+                                  value={step.title} onChange={(e) => updateStep(index, 'title', e.target.value)} />
+                             </div>
+                             <div className="space-y-3">
+                                <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Description</label>
+                                <textarea rows={4} className="w-full bg-transparent border border-white/5 p-4 text-lg serif italic outline-none focus:border-[#8E4E35] resize-none" 
+                                  value={step.description} onChange={(e) => updateStep(index, 'description', e.target.value)} />
+                             </div>
+                          </div>
+                       </div>
+                    </div>
+                  ))}
+                  
+                  <button onClick={addProcessStep} className="w-full py-8 border border-dashed border-white/10 text-white/30 hover:text-[#8E4E35] hover:border-[#8E4E35] hover:bg-[#8E4E35]/5 transition-all flex items-center justify-center gap-3 text-[10px] uppercase font-black tracking-widest">
+                    <Plus size={16} /> Add Method Step
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'Journal' && (
+              <div className="space-y-12 animate-in fade-in slide-in-from-bottom-2 duration-700">
+                 <div className="border-b border-white/5 pb-8 flex justify-between items-end">
+                   <div>
+                      <h2 className="text-3xl md:text-4xl serif italic text-white/90">Journal & Notes</h2>
+                      <p className="text-[9px] md:text-[10px] uppercase text-white/20 tracking-widest mt-2">Studio reflections and logs.</p>
+                   </div>
+                   <FileText size={20} className="text-white/10" />
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Section Title</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.notes.title} onChange={(e) => updateNotes('title', e.target.value)} />
+                   </div>
+                   <div className="space-y-3">
+                      <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Document ID</label>
+                      <input className="w-full bg-black/20 border-b border-white/10 p-3 text-lg outline-none focus:border-[#8E4E35]" 
+                        value={siteContent.notes.documentId} onChange={(e) => updateNotes('documentId', e.target.value)} />
+                   </div>
+                </div>
+
+                <div className="space-y-8">
+                   {siteContent.notes.entries.map((note, index) => (
+                      <div key={note.id} className="bg-black/20 border border-white/5 p-6 md:p-8 space-y-6 relative group">
+                         <button onClick={() => removeNoteEntry(index)} className="absolute top-4 right-4 text-white/10 hover:text-red-500 transition-colors">
+                            <X size={16} />
+                         </button>
+                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-3">
+                                <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Entry Title</label>
+                                <input className="w-full bg-transparent border-b border-white/10 p-2 text-xl font-light serif italic outline-none focus:border-[#8E4E35]" 
+                                  value={note.title} onChange={(e) => updateNoteEntry(index, 'title', e.target.value)} />
+                            </div>
+                            <div className="space-y-3">
+                                <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Date</label>
+                                <input className="w-full bg-transparent border-b border-white/10 p-2 text-sm font-black mono uppercase outline-none focus:border-[#8E4E35]" 
+                                  value={note.date} onChange={(e) => updateNoteEntry(index, 'date', e.target.value)} />
+                            </div>
+                         </div>
+                         <div className="space-y-3">
+                            <label className="text-[9px] uppercase font-black text-white/30 tracking-widest">Content</label>
+                            <textarea rows={4} className="w-full bg-transparent border border-white/5 p-4 text-lg serif font-light text-white/80 outline-none focus:border-[#8E4E35] resize-none" 
+                               value={note.content} onChange={(e) => updateNoteEntry(index, 'content', e.target.value)} />
+                         </div>
+                      </div>
+                   ))}
+                   
+                   <button onClick={addNoteEntry} className="w-full py-8 border border-dashed border-white/10 text-white/30 hover:text-[#8E4E35] hover:border-[#8E4E35] hover:bg-[#8E4E35]/5 transition-all flex items-center justify-center gap-3 text-[10px] uppercase font-black tracking-widest">
+                    <Plus size={16} /> New Journal Entry
+                  </button>
                 </div>
               </div>
             )}

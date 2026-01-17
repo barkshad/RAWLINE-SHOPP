@@ -11,55 +11,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,100..900;1,100..900&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&family=Caveat:wght@400..700&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Vintage Kenyan Luxury Palette */
             --raw-bg: #F2EDE4;
             --raw-ink: #1A1816;
-            --raw-clay: #B09E80;
-            --raw-mineral: #1B3147;
             --raw-ochre: #8E4E35;
-            --raw-moss: #3D4A3E;
-            --raw-gold: #D4AF37;
-            --frame-padding: 12px; /* Default for mobile */
         }
         
-        @media (min-width: 768px) {
-            :root {
-                --frame-padding: 18px; /* Classic thickness for desktop */
-            }
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--raw-bg);
             color: var(--raw-ink);
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            letter-spacing: -0.01em;
         }
 
         .serif { font-family: 'Playfair Display', serif; }
         .mono { font-family: 'Space Mono', monospace; }
         .handwritten { font-family: 'Caveat', cursive; }
 
-        /* Vintage Overlays */
-        .vignette {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 998;
-            background: radial-gradient(circle, transparent 40%, rgba(0,0,0,0.15) 100%);
-        }
-
-        .vintage-tint {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 997;
-            background: rgba(142, 78, 53, 0.03);
-            mix-blend-mode: multiply;
-        }
-
-        /* Enhanced Noise System */
         .noise::after {
             content: "";
             position: fixed;
@@ -69,7 +37,7 @@
             height: 200%;
             pointer-events: none;
             z-index: 1000;
-            opacity: 0.08;
+            opacity: 0.05;
             background-image: url("https://grainy-gradients.vercel.app/noise.svg");
             animation: grain 4s steps(10) infinite;
         }
@@ -87,10 +55,9 @@
             90% { transform:translate(-5%, -8%) }
         }
 
-        /* Reveal System */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
+            transform: translateY(20px);
             transition: opacity 1.2s cubic-bezier(0.16, 1, 0.3, 1), transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .reveal.active {
@@ -98,66 +65,28 @@
             transform: translateY(0);
         }
 
-        /* --- LUXURIOUS GOLD FRAME SYSTEM --- */
+        /* Original Archival Photo Design */
         .archive-photo {
             position: relative;
-            padding: var(--frame-padding);
-            background: linear-gradient(145deg, #EAD9A8, #B08D57);
-            border: 1px solid rgba(94, 75, 60, 0.5);
-            box-shadow: 
-                0 20px 40px -10px rgba(0,0,0,0.3),
-                inset 0 0 0 1px rgba(255, 235, 180, 0.3),
-                inset 0 0 20px rgba(0,0,0,0.3);
-            transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            background: white;
+            padding: 10px;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+            transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Inner fillet line */
-        .archive-photo::before {
-            content: '';
-            position: absolute;
-            inset: calc(var(--frame-padding) - 2px);
-            pointer-events: none;
-            z-index: 2;
-            border: 1px solid rgba(0,0,0,0.4);
-        }
-
-        /* Glass sheen effect */
         .archive-photo::after {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(120deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0) 40%);
-            opacity: 0.8;
-            transition: opacity 0.7s, background 0.7s;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1), transparent);
             pointer-events: none;
-            z-index: 3;
         }
 
-        .archive-photo:hover::after {
-            opacity: 1;
-            background: linear-gradient(120deg, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 50%);
-        }
+        .image-zoom-container { overflow: hidden; }
+        .image-zoom-container img { transition: transform 1.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        .image-zoom-container:hover img { transform: scale(1.04); }
 
-        .archive-photo > * {
-            position: relative;
-            z-index: 1;
-        }
-
-        /* Image Zoom Utility */
-        .image-zoom-container {
-            overflow: hidden;
-        }
-        .image-zoom-container img {
-            transition: transform 1.2s cubic-bezier(0.16, 1, 0.3, 1);
-        }
-        .image-zoom-container:hover img {
-            transform: scale(1.05);
-        }
-
-        /* Custom Cursor - Responsive */
         @media (pointer: fine) {
             body { cursor: none; }
             #cursor {
@@ -171,34 +100,25 @@
             }
             #cursor-follower {
                 position: fixed;
-                width: 40px;
-                height: 40px;
-                border: 0.5px solid var(--raw-ochre);
-                background: rgba(142, 78, 53, 0.05);
-                backdrop-filter: blur(1px);
+                width: 32px;
+                height: 32px;
+                border: 1px solid rgba(142, 78, 53, 0.2);
                 border-radius: 50%;
                 pointer-events: none;
                 z-index: 99998;
-                transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+                transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1);
             }
         }
 
-        /* Museum Glass */
         .museum-glass {
-            background: rgba(242, 237, 228, 0.85);
-            backdrop-filter: blur(15px);
-            border-bottom: 1px solid rgba(0,0,0,0.05);
+            background: rgba(242, 237, 228, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0,0,0,0.03);
         }
 
-        /* Ink Bleed Typography */
-        .ink-bleed {
-            text-shadow: 0 0 1px rgba(0,0,0,0.1);
-        }
-
-        /* Scanned Grid */
         .scanlines {
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.02) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.01), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.01));
-            background-size: 100% 3px, 3px 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.01) 50%);
+            background-size: 100% 4px;
             pointer-events: none;
             z-index: 996;
             position: fixed;
@@ -216,7 +136,10 @@
     "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
     "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
     "vite": "https://esm.sh/vite@^7.3.1",
-    "firebase/": "https://esm.sh/firebase@^12.7.0/"
+    "firebase/app": "https://esm.sh/firebase@^10.8.0/app",
+    "firebase/analytics": "https://esm.sh/firebase@^10.8.0/analytics",
+    "firebase/firestore": "https://esm.sh/firebase@^10.8.0/firestore",
+    "firebase/": "https://esm.sh/firebase@^10.8.0/"
   }
 }
 </script>
@@ -224,66 +147,23 @@
 <body class="noise">
     <div id="cursor" class="hidden md:block"></div>
     <div id="cursor-follower" class="hidden md:block"></div>
-    <div class="vignette"></div>
-    <div class="vintage-tint"></div>
     <div class="scanlines"></div>
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
     <script>
-        try {
-            const cursor = document.getElementById('cursor');
-            const follower = document.getElementById('cursor-follower');
-            
-            if (window.matchMedia("(pointer: fine)").matches && cursor && follower) {
-                let mouseX = 0, mouseY = 0;
-                let cursorX = 0, cursorY = 0;
-                let followerX = 0, followerY = 0;
-
-                document.addEventListener('mousemove', (e) => {
-                    mouseX = e.clientX;
-                    mouseY = e.clientY;
-                });
-
-                const animate = () => {
-                    cursorX += (mouseX - cursorX) * 0.25;
-                    cursorY += (mouseY - cursorY) * 0.25;
-                    followerX += (mouseX - followerX) * 0.12;
-                    followerY += (mouseY - followerY) * 0.12;
-
-                    cursor.style.left = cursorX + 'px';
-                    cursor.style.top = cursorY + 'px';
-                    follower.style.left = (followerX - 20) + 'px';
-                    follower.style.top = (followerY - 20) + 'px';
-
-                    requestAnimationFrame(animate);
-                };
-                animate();
-
-                document.addEventListener('mousedown', () => {
-                    follower.style.transform = 'scale(0.7)';
-                });
-                document.addEventListener('mouseup', () => {
-                    follower.style.transform = 'scale(1)';
-                });
-
-                const addHoverEvents = () => {
-                    document.querySelectorAll('a, button, input').forEach(el => {
-                        el.addEventListener('mouseenter', () => {
-                            follower.style.transform = 'scale(1.5)';
-                            follower.style.background = 'rgba(142, 78, 53, 0.1)';
-                        });
-                        el.addEventListener('mouseleave', () => {
-                            follower.style.transform = 'scale(1)';
-                            follower.style.background = 'rgba(142, 78, 53, 0.05)';
-                        });
-                    });
-                };
-                const observer = new MutationObserver(addHoverEvents);
-                observer.observe(document.body, { childList: true, subtree: true });
-                addHoverEvents();
-            }
-        } catch (e) {
-            console.log("Cursor init skipped", e);
+        const cursor = document.getElementById('cursor');
+        const follower = document.getElementById('cursor-follower');
+        if (window.matchMedia("(pointer: fine)").matches && cursor && follower) {
+            let mouseX = 0, mouseY = 0, cx = 0, cy = 0, fx = 0, fy = 0;
+            document.addEventListener('mousemove', (e) => { mouseX = e.clientX; mouseY = e.clientY; });
+            const animate = () => {
+                cx += (mouseX - cx) * 0.2; cy += (mouseY - cy) * 0.2;
+                fx += (mouseX - fx) * 0.1; fy += (mouseY - fy) * 0.1;
+                cursor.style.left = cx + 'px'; cursor.style.top = cy + 'px';
+                follower.style.left = (fx - 16) + 'px'; follower.style.top = (fy - 16) + 'px';
+                requestAnimationFrame(animate);
+            };
+            animate();
         }
     </script>
 </body>

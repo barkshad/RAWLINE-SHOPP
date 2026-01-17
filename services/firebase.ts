@@ -1,7 +1,8 @@
-
 import { initializeApp } from "firebase/app";
+import { getAnalytics } from "firebase/analytics";
 import { getFirestore } from "firebase/firestore";
 
+// Firebase configuration (RAWLINE)
 const firebaseConfig = {
   apiKey: "AIzaSyDBuvCPjVz_NGOhbCyS7doOE1L6DkzQBHc",
   authDomain: "rawline-7b60c.firebaseapp.com",
@@ -12,5 +13,20 @@ const firebaseConfig = {
   measurementId: "G-GG5BYHP5RZ"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Analytics (browser only) - Safely wrapped to prevent crashes
+let analytics = null;
+if (typeof window !== "undefined") {
+  try {
+    analytics = getAnalytics(app);
+  } catch (e) {
+    console.warn("Firebase Analytics failed to initialize (non-critical):", e);
+  }
+}
+
+// ✅ INITIALIZE FIRESTORE
 export const db = getFirestore(app);
+
+export { analytics };
